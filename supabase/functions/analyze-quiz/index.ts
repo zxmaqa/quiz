@@ -36,36 +36,76 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 type CallResult = { ok: true; data: unknown } | { ok: false; status: number; error: string }
 
-// Claude may wrap JSON in a code fence or add a sentence around it.
-const extractJson = (raw: string) => {
-  const from = raw.indexOf('{')
-  const to = raw.lastIndexOf('}')
-  const fromArr = raw.indexOf('[')
-  const toArr = raw.lastIndexOf(']')
-  return from !== -1 && (fromArr === -1 || from < fromArr) ? raw.slice(from, to + 1) : raw.slice(fromArr, toArr + 1)
+// Models sometimes wrap JSON in a code fence, add a sentence around it, or stop one closing bracket short.
+// Strip fences, read from a starting bracket to its matching end, and if the text ends early append the
+// missing } or ] (in the right order). The result still has to pass JSON.parse and the shape check.
+function balanceFrom(text: string, start: number): string {
+  const stack: string[] = []
+  let inString = false
+  let escaped = false
+  for (let i = start; i < text.length; i++) {
+    const c = text[i]
+    if (inString) {
+      if (escaped) escaped = false
+      else if (c === '\\') escaped = true
+      else if (c === '"') inString = false
+      continue
+    }
+    if (c === '"') inString = true
+    else if (c === '{' || c === '[') stack.push(c)
+    else if (c === '}' || c === ']') {
+      stack.pop()
+      if (stack.length === 0) return text.slice(start, i + 1) // complete: anything after it is ignored
+    }
+  }
+  // ended early: close an open string, drop a dangling comma, then close the open brackets
+  let body = text.slice(start).trimEnd()
+  if (inString) body += '"'
+  body = body.replace(/,\s*$/, '')
+  return body + stack.reverse().map((c) => (c === '{' ? '}' : ']')).join('')
+}
+
+// Candidate JSON texts of a reply, objects before arrays, at most a few starting points.
+function jsonCandidates(raw: string): string[] {
+  const text = raw.replace(/```[a-zA-Z]*/g, ' ')
+  const starts = [...text.matchAll(/\{/g)].map((m) => m.index!).slice(0, 4)
+  const arrays = [...text.matchAll(/\[/g)].map((m) => m.index!).slice(0, 2)
+  return [...starts, ...arrays].map((i) => balanceFrom(text, i))
 }
 
 function parseModelJson(raw: string, shapeKey = 'questions'): CallResult {
-  try {
-    const parsed = JSON.parse(extractJson(raw))
-    const data = Array.isArray(parsed) ? { [shapeKey]: parsed } : parsed
-    return Array.isArray(data?.[shapeKey])
-      ? { ok: true, data }
-      : { ok: false, status: 502, error: `Unexpected shape: ${raw.slice(0, 300)}` }
-  } catch {
-    return { ok: false, status: 502, error: `Invalid JSON: ${raw.slice(0, 300)}` }
+  for (const candidate of jsonCandidates(raw)) {
+    try {
+      const parsed = JSON.parse(candidate)
+      const data = Array.isArray(parsed) ? { [shapeKey]: parsed } : parsed
+      if (Array.isArray(data?.[shapeKey])) return { ok: true, data }
+    } catch {
+      // try the next starting point
+    }
+  }
+  const looksJson = /[{[]/.test(raw)
+  return {
+    ok: false,
+    status: 502,
+    error: looksJson && jsonCandidates(raw).some((c) => { try { JSON.parse(c); return true } catch { return false } })
+      ? `Unexpected shape: ${raw.slice(0, 300)}`
+      : `Invalid JSON: ${raw.slice(0, 300)}`,
   }
 }
 
 // One model call (Claude or Gemini, chosen by model name). Every call is logged to ai_calls.
+const RETRY_LINE = 'Return only one complete, valid JSON object, no code fences.'
+
 async function callModelOnce(
   model: string,
-  prompt: string,
+  basePrompt: string,
   kind: string,
   quizId: string | null,
   shapeKey = 'questions',
   images?: string[],
+  retry = false, // second attempt after a reply that was not valid JSON: one extra line, temperature 0.2
 ): Promise<{ result: CallResult; logId: string }> {
+  const prompt = retry ? `${basePrompt}\n\n${RETRY_LINE}` : basePrompt
   const started = Date.now()
   const logId = crypto.randomUUID()
   let result: CallResult
@@ -83,7 +123,7 @@ async function callModelOnce(
         body: JSON.stringify({
           model,
           max_tokens: 8192,
-          temperature: 0,
+          temperature: retry ? 0.2 : 0,
           messages: [
             {
               role: 'user',
@@ -118,7 +158,7 @@ async function callModelOnce(
               parts: [...(images ?? []).map((data) => ({ inlineData: { mimeType: 'image/jpeg', data } })), { text: prompt }],
             },
           ],
-          generationConfig: { responseMimeType: 'application/json', temperature: 0 },
+          generationConfig: { responseMimeType: 'application/json', temperature: retry ? 0.2 : 0 },
         }),
       })
       const body = await res.json().catch(() => null)
@@ -163,7 +203,7 @@ async function callModel(
 ): Promise<{ result: CallResult; logId: string }> {
   const first = await callModelOnce(model, prompt, kind, quizId, shapeKey, images)
   const badJson = !first.result.ok && /^(Invalid JSON|Unexpected shape)/.test(first.result.error)
-  return badJson ? callModelOnce(model, prompt, kind, quizId, shapeKey, images) : first
+  return badJson ? callModelOnce(model, prompt, kind, quizId, shapeKey, images, true) : first
 }
 
 // ---- exact arithmetic (no eval) -------------------------------------------------------------

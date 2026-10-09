@@ -84,6 +84,7 @@ export default function Teacher() {
         .join('\n\n')
       // call 1 fills topics, call 2 gets the stored correct answers and writes the reasons
       const topics = await extract(text, groupId)
+      // if the reasons call fails twice, topics and solutions are still saved and stored reasons stay as they are
       const reasons = await writeReasons(
         questions.map((q) => ({
           position: q.position,
@@ -93,23 +94,29 @@ export default function Teacher() {
         })),
         quizId,
         groupId,
-      )
+      ).catch(() => null)
       const results = await Promise.all(
         questions.map((q) => {
           const topic = topics.questions.find((a) => a.position === q.position)?.topic
-          const m = reasons[q.position]
+          const m = reasons?.[q.position]
           return supabase
             .from('questions')
             .update({
               ...(topic ? { topic } : {}),
-              misconceptions: m ? withoutCorrect(m, q.correct_label) : null,
+              ...(reasons ? { misconceptions: m ? withoutCorrect(m, q.correct_label) : null } : {}),
             })
             .eq('id', q.id)
         }),
       )
       // verified worked solutions (solve mode)
       const solved = await solveAndStore(quizId, questions)
-      note(results.some((r) => r.error) || !solved ? 'Yadda saxlamaq alınmadı.' : 'AI analiz tamamlandı.')
+      note(
+        results.some((r) => r.error) || !solved
+          ? 'Yadda saxlamaq alınmadı.'
+          : reasons
+            ? 'AI analiz tamamlandı.'
+            : 'AI bu dəfə səbəbləri yaratmadı, quiz saxlanıldı',
+      )
     } catch {
       note('AI xətası. Bir az sonra yenidən cəhd edin.')
     }

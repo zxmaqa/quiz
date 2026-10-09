@@ -23,6 +23,7 @@ export default function NewQuiz({
   const [draft, setDraft] = useState<Draft[] | null>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState('')
+  const [note, setNote] = useState('')
 
   async function read() {
     setBusy(true)
@@ -59,6 +60,7 @@ export default function NewQuiz({
     if (!draft) return
     setBusy(true)
     setError('')
+    setNote('')
     try {
       const reasons = await writeReasons(
         draft.map((q, i) => ({ position: i + 1, text: q.text, options: q.options, correct_label: q.correct! })),
@@ -67,7 +69,7 @@ export default function NewQuiz({
       )
       setDraft((d) => d && d.map((q, i) => ({ ...q, misconceptions: reasons[i + 1] ?? null })))
     } catch {
-      setError('AI xətası. Bir az sonra yenidən cəhd edin.')
+      setNote('AI bu dəfə səbəbləri yaratmadı. Quizi yenə də saxlaya bilərsiniz.')
     }
     setBusy(false)
   }
@@ -214,6 +216,7 @@ export default function NewQuiz({
           {error}
         </p>
       )}
+      {note && <p className="rounded-input bg-primary-soft p-3 text-sm">{note}</p>}
       <button
         disabled={busy || !ready}
         onClick={writeAllReasons}
