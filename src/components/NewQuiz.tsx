@@ -94,29 +94,33 @@ export default function NewQuiz({ groupId, onSaved }: { groupId: string; onSaved
 
   if (!draft) {
     return (
-      <section className="space-y-3 rounded-xl border border-gray-300 p-4">
+      <section className="card space-y-4">
         <label className="block space-y-1">
-          <span className="font-medium">Quizin adı</span>
+          <span className="font-semibold">Quizin adı</span>
           <input
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            className="w-full rounded-xl border-2 border-gray-300 p-3"
+            className="input"
           />
         </label>
         <label className="block space-y-1">
-          <span className="font-medium">Quiz mətni</span>
+          <span className="font-semibold">Quiz mətni</span>
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
             rows={10}
-            className="w-full rounded-xl border-2 border-gray-300 p-3"
+            className="input"
           />
         </label>
-        {error && <p className="text-red-600">{error}</p>}
+        {error && (
+        <p role="alert" className="rounded-input bg-warn-bg p-3 text-warn">
+          {error}
+        </p>
+      )}
         <button
           disabled={busy || !title.trim() || !text.trim()}
           onClick={read}
-          className="w-full rounded-xl bg-blue-700 p-3 font-semibold text-white disabled:opacity-40"
+          className="btn btn-primary w-full"
         >
           {busy ? 'Oxunur…' : 'AI ilə oxu'}
         </button>
@@ -129,18 +133,16 @@ export default function NewQuiz({ groupId, onSaved }: { groupId: string; onSaved
   return (
     <section className="space-y-4">
       <h2 className="text-lg font-semibold">{title}</h2>
-      <p className="text-sm text-gray-600">Hər sual üçün düzgün cavabı toxunaraq seçin.</p>
+      <p className="text-sm text-muted">Hər sual üçün düzgün cavabı toxunaraq seçin.</p>
       {draft.map((q, i) => (
-        <div key={i} className="space-y-2 rounded-xl border border-gray-300 p-3">
-          <p className="whitespace-pre-line font-medium">
+        <div key={i} className="card space-y-3">
+          <p className="whitespace-pre-line font-semibold">
             {i + 1}. {q.text}
           </p>
           <select
             value={q.topic}
             onChange={(e) => update(i, { topic: e.target.value })}
-            className={`w-full rounded-lg border-2 p-2 ${
-              q.topic === UNSURE ? 'border-amber-500 bg-amber-100' : 'border-gray-300'
-            }`}
+            className={`input ${q.topic === UNSURE ? 'border-warn! bg-warn-bg! text-warn!' : ''}`}
           >
             {[...topics, UNSURE].map((t) => (
               <option key={t} value={t}>
@@ -155,14 +157,16 @@ export default function NewQuiz({ groupId, onSaved }: { groupId: string; onSaved
               <div key={o.label}>
                 <button
                   onClick={() => update(i, { correct: o.label, misconceptions: null })}
-                  className={`w-full rounded-lg border-2 p-3 text-left ${
-                    q.correct === o.label ? 'border-green-700 bg-green-100' : 'border-gray-300'
+                  aria-pressed={q.correct === o.label}
+                  className={`flex min-h-12 w-full items-center gap-3 rounded-btn border-2 px-3 py-2 text-left transition-colors duration-150 ${
+                    q.correct === o.label ? 'border-ok bg-ok-bg' : 'border-line bg-card hover:border-primary'
                   }`}
                 >
-                  <span className="font-bold">{o.label}</span> {o.text}
+                  <span className={`letter ${q.correct === o.label ? 'border-ok bg-ok text-white' : ''}`}>{o.label}</span>
+                  <span>{o.text}</span>
                 </button>
                 {shown && (
-                  <p className="px-2 pt-1 text-sm text-gray-700">
+                  <p className="px-2 pt-1 text-sm text-muted">
                     {`Ehtimal olunan səbəb: ${shown.reason}${
                       shown.calculation ? ` (ehtimal olunan hesablama: ${shown.calculation})` : ''
                     }`}
@@ -173,18 +177,22 @@ export default function NewQuiz({ groupId, onSaved }: { groupId: string; onSaved
           })}
         </div>
       ))}
-      {error && <p className="text-red-600">{error}</p>}
+      {error && (
+        <p role="alert" className="rounded-input bg-warn-bg p-3 text-warn">
+          {error}
+        </p>
+      )}
       <button
         disabled={busy || !ready}
         onClick={writeAllReasons}
-        className="w-full rounded-xl border-2 border-blue-700 p-3 font-semibold text-blue-700 disabled:opacity-40"
+        className="btn btn-secondary w-full"
       >
         {busy ? 'Gözləyin…' : 'Səbəbləri AI ilə yaz'}
       </button>
       <button
         disabled={busy || !ready}
         onClick={save}
-        className="w-full rounded-xl bg-green-700 p-4 font-semibold text-white disabled:opacity-40"
+        className="btn btn-primary w-full"
       >
         {busy ? 'Saxlanılır…' : 'Yadda saxla və paylaş'}
       </button>

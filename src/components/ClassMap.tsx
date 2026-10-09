@@ -66,16 +66,16 @@ export default function ClassMap({
   if (rows.length === 0) return null
 
   return (
-    <section className="space-y-3 rounded-xl border border-gray-300 p-3">
-      <h2 className="text-lg font-semibold">Sinif xəritəsi</h2>
-      <div className="overflow-x-auto">
+    <section className="card space-y-4 p-0">
+      <h2 className="px-5 pt-5 text-lg font-semibold">Sinif xəritəsi</h2>
+      <div className="overflow-x-auto px-5">
         <table className="w-full border-collapse text-center text-sm">
           <thead>
-            <tr className="border-b-2 border-gray-300">
-              <th className="p-2 text-left">Mövzu</th>
-              <th className="p-2">Zəif şagird</th>
+            <tr className="border-b-2 border-line">
+              <th className="sticky left-0 bg-card p-2 text-left">Mövzu</th>
+              <th className="whitespace-nowrap p-2">Zəif şagird</th>
               {students.map((s, i) => (
-                <th key={i} className="p-2 font-normal">
+                <th key={i} className="whitespace-nowrap p-2 font-normal text-muted">
                   {s.student_name}
                 </th>
               ))}
@@ -83,13 +83,13 @@ export default function ClassMap({
           </thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.topic} className="border-b border-gray-200">
-                <td className="p-2 text-left font-medium">{topicLabel(r.topic)}</td>
-                <td className="p-2 font-semibold">
+              <tr key={r.topic} className="border-b border-line">
+                <td className="sticky left-0 min-w-40 bg-card p-2 text-left font-semibold">{topicLabel(r.topic)}</td>
+                <td className="mono whitespace-nowrap p-2">
                   {r.weakCount} / {students.length}
                 </td>
                 {r.cells.map((c, i) => (
-                  <td key={i} className={`p-2 ${c.weak ? 'bg-red-100 font-semibold text-red-700' : ''}`}>
+                  <td key={i} className={`mono p-2 ${c.weak ? 'bg-warn-bg text-warn' : ''}`}>
                     {c.accuracy}%
                   </td>
                 ))}
@@ -99,18 +99,22 @@ export default function ClassMap({
         </table>
       </div>
 
-      <div className="space-y-2">
-        <div className="flex items-center justify-between gap-2">
+      <div className="space-y-3 border-t border-line bg-primary-soft p-5">
+        <div className="flex items-center justify-between gap-3">
           <h3 className="font-semibold">AI təhlili · ehtimal</h3>
           <button
             disabled={busy}
             onClick={generate}
-            className="rounded-lg border-2 border-blue-700 px-3 py-1 text-sm font-semibold text-blue-700 disabled:opacity-40"
+            className="btn btn-secondary"
           >
             {busy ? 'Yenilənir…' : 'Yenilə'}
           </button>
         </div>
-        {failed && <p className="text-sm text-red-600">AI xətası. Bir az sonra yenidən cəhd edin.</p>}
+        {failed && (
+          <p role="alert" className="rounded-input bg-warn-bg p-3 text-sm text-warn">
+            AI xətası. Bir az sonra yenidən cəhd edin.
+          </p>
+        )}
         {summary && summary.focus_topics.length === 0 && summary.next_lesson_plan.length === 0 && (
           <p className="text-sm">Fokus mövzu tapılmadı.</p>
         )}

@@ -79,33 +79,35 @@ export default function Student() {
     setSaved((s) => ({ ...s, submitted: true }))
   }
 
-  if (loading) return <main className="p-4">Yüklənir…</main>
-  if (!quiz || questions.length === 0) return <main className="p-4">Quiz tapılmadı.</main>
+  if (loading) return <main className="mx-auto max-w-[480px] p-4">Yüklənir…</main>
+  if (!quiz || questions.length === 0) return <main className="mx-auto max-w-[480px] p-4">Quiz tapılmadı.</main>
 
   if (saved.submitted) return <Result quiz={quiz} questions={questions} answers={saved.answers} />
 
-  if (quiz.status !== 'live') return <main className="p-4">Bu quiz hazırda aktiv deyil.</main>
+  if (quiz.status !== 'live') return <main className="mx-auto max-w-[480px] p-4">Bu quiz hazırda aktiv deyil.</main>
 
   if (!saved.name) {
     return (
-      <main className="mx-auto max-w-xl space-y-4 p-4">
-        <h1 className="text-2xl font-bold">{quiz.title}</h1>
-        <label className="block space-y-2">
-          <span className="font-medium">Adınız</span>
-          <input
-            value={nameInput}
-            maxLength={30}
-            onChange={(e) => setNameInput(e.target.value)}
-            className="w-full rounded-xl border-2 border-gray-300 p-4 text-lg"
-          />
-        </label>
-        <button
-          disabled={!nameInput.trim()}
-          onClick={() => setSaved((s) => ({ ...s, name: nameInput.trim().slice(0, 30) }))}
-          className="w-full rounded-xl bg-blue-700 p-4 text-lg font-semibold text-white disabled:opacity-40"
-        >
-          Başla
-        </button>
+      <main className="mx-auto max-w-[480px] p-4">
+        <div className="card space-y-4">
+          <h1 className="text-2xl font-bold">{quiz.title}</h1>
+          <label className="block space-y-2">
+            <span className="font-semibold">Adınız</span>
+            <input
+              value={nameInput}
+              maxLength={30}
+              onChange={(e) => setNameInput(e.target.value)}
+              className="input text-lg"
+            />
+          </label>
+          <button
+            disabled={!nameInput.trim()}
+            onClick={() => setSaved((s) => ({ ...s, name: nameInput.trim().slice(0, 30) }))}
+            className="btn btn-primary w-full text-lg"
+          >
+            Başla
+          </button>
+        </div>
       </main>
     )
   }
@@ -119,60 +121,81 @@ export default function Student() {
   const go = (index: number) => setSaved((s) => ({ ...s, index }))
 
   return (
-    <main className="mx-auto max-w-xl space-y-4 p-4">
-      <p className="text-sm text-gray-600">
-        Sual {saved.index + 1} / {questions.length}
-      </p>
-      <h1 className="whitespace-pre-line text-xl font-bold">{q.text}</h1>
+    <main className="mx-auto max-w-[480px] space-y-4 p-4 pb-32">
+      <div className="space-y-2">
+        <div className="flex items-center justify-between text-sm text-muted">
+          <span>Sual</span>
+          <span className="mono text-base text-ink">
+            {saved.index + 1} / {questions.length}
+          </span>
+        </div>
+        <div
+          role="progressbar"
+          aria-valuemin={1}
+          aria-valuemax={questions.length}
+          aria-valuenow={saved.index + 1}
+          className="h-2 overflow-hidden rounded-full bg-line"
+        >
+          <div
+            className="h-2 rounded-full bg-primary transition-[width] duration-150"
+            style={{ width: `${((saved.index + 1) / questions.length) * 100}%` }}
+          />
+        </div>
+      </div>
+      <section className="card">
+        <h1 className="whitespace-pre-line text-xl font-bold">{q.text}</h1>
+      </section>
       <div className="space-y-3">
-        {q.options.map((o) => (
-          <button
-            key={o.label}
-            onClick={() => choose(o.label)}
-            className={`flex min-h-16 w-full items-center gap-3 rounded-xl border-2 p-4 text-left text-lg ${
-              chosen === o.label ? 'border-blue-700 bg-blue-100' : 'border-gray-300'
-            }`}
-          >
-            <span className="font-bold">{o.label}</span>
-            <span>{o.text}</span>
-          </button>
-        ))}
+        {q.options.map((o) => {
+          const selected = chosen === o.label
+          return (
+            <button
+              key={o.label}
+              onClick={() => choose(o.label)}
+              aria-pressed={selected}
+              className={`flex min-h-14 w-full items-center gap-3 rounded-btn border-2 px-4 py-3 text-left text-lg transition-colors duration-150 ${
+                selected ? 'border-primary bg-primary-soft' : 'border-line bg-card hover:border-primary'
+              }`}
+            >
+              <span className={`letter ${selected ? 'border-primary bg-primary text-white' : ''}`}>{o.label}</span>
+              <span>{o.text}</span>
+            </button>
+          )
+        })}
         <button
           onClick={() => choose(null)}
-          className={`w-full rounded-xl border-2 p-3 ${
-            isBlank ? 'border-blue-700 bg-blue-100' : 'border-gray-300'
+          aria-pressed={isBlank}
+          className={`mx-auto block min-h-12 rounded-btn px-4 text-primary underline underline-offset-4 ${
+            isBlank ? 'bg-primary-soft font-semibold' : ''
           }`}
         >
           Bilmirəm, boş burax
         </button>
       </div>
       {sendError && (
-        <p className="text-red-600">Göndərmək alınmadı. Cavablarınız saxlanıldı, yenidən cəhd edin.</p>
+        <p role="alert" className="rounded-input bg-warn-bg p-3 text-warn">
+          Göndərmək alınmadı. Cavablarınız saxlanıldı, yenidən cəhd edin.
+        </p>
       )}
-      <div className="flex gap-3">
-        <button
-          disabled={saved.index === 0}
-          onClick={() => go(saved.index - 1)}
-          className="flex-1 rounded-xl border-2 border-gray-300 p-4 font-semibold disabled:opacity-40"
-        >
-          Əvvəlki
-        </button>
-        {isLast ? (
+      <div className="fixed inset-x-0 bottom-0 border-t border-line bg-card">
+        <div className="mx-auto flex max-w-[480px] gap-3 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3">
           <button
-            disabled={sending}
-            onClick={submit}
-            className="flex-1 rounded-xl bg-green-700 p-4 font-semibold text-white disabled:opacity-40"
+            disabled={saved.index === 0}
+            onClick={() => go(saved.index - 1)}
+            className="btn btn-secondary flex-1"
           >
-            {sending ? 'Göndərilir…' : sendError ? 'Yenidən göndər' : 'Göndər'}
+            Əvvəlki
           </button>
-        ) : (
-          <button
-            onClick={() => go(saved.index + 1)}
-            className="flex-1 rounded-xl bg-blue-700 p-4 font-semibold text-white"
-          >
-            Növbəti
-          </button>
-        )}
+          {isLast ? (
+            <button disabled={sending} onClick={submit} className="btn btn-primary flex-1">
+              {sending ? 'Göndərilir…' : sendError ? 'Yenidən göndər' : 'Göndər'}
+            </button>
+          ) : (
+            <button onClick={() => go(saved.index + 1)} className="btn btn-primary flex-1">
+              Növbəti
+            </button>
+          )}
+        </div>
       </div>
     </main>
   )
@@ -184,14 +207,27 @@ function Result({ quiz, questions, answers }: { quiz: Quiz; questions: Question[
   const { missed, strong } = analyzeStudent(questions, answers)
 
   return (
-    <main className="mx-auto max-w-xl space-y-4 p-4">
-      <h1 className="text-2xl font-bold">{quiz.title}</h1>
-      <p className="text-3xl font-bold">
-        Nəticə: {score(questions, answers)} / {questions.length}
-      </p>
-      <section>
+    <main className="mx-auto max-w-[480px] space-y-4 p-4">
+      <h1 className="text-xl font-bold">{quiz.title}</h1>
+      <section className="card text-center">
+        <p className="text-muted">Nəticə</p>
+        <p className="mono text-5xl">
+          {score(questions, answers)} / {questions.length}
+        </p>
+      </section>
+      <section className="card space-y-3">
         <h2 className="font-semibold">Bu mövzular üzərində işlə</h2>
-        <p>{weak.length ? weak.map(topicName).join(', ') : 'Zəif mövzu yoxdur.'}</p>
+        {weak.length ? (
+          <div className="flex flex-wrap gap-2">
+            {weak.map((t) => (
+              <span key={t} className="chip">
+                {topicName(t)}
+              </span>
+            ))}
+          </div>
+        ) : (
+          <p className="text-muted">Zəif mövzu yoxdur.</p>
+        )}
       </section>
       {missed.length > 0 && (
         <section className="space-y-3">
@@ -202,17 +238,17 @@ function Result({ quiz, questions, answers }: { quiz: Quiz; questions: Question[
         </section>
       )}
       {missed.some((m) => m.misconception) && (
-        <section className="space-y-2">
+        <section className="card space-y-2">
           <h2 className="font-semibold">Ehtimal olunan səbəblər</h2>
           {strong.map((s) => (
-            <p key={s.reason} className="text-sm">
+            <p key={s.reason} className="text-sm font-semibold text-warn">
               Güclü siqnal: ehtimal, eyni səhv {s.count} dəfə təkrarlanıb: {s.reason}
             </p>
           ))}
           {missed
             .filter((m) => m.misconception)
             .map((m) => (
-              <p key={m.q.id} className="text-sm text-gray-700">
+              <p key={m.q.id} className="text-sm text-muted">
                 {m.q.position}. {m.misconception!.reason}
                 {m.misconception!.calculation && <> (ehtimal olunan hesablama: {m.misconception!.calculation})</>}
               </p>

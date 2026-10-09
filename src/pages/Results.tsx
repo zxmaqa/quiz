@@ -9,9 +9,9 @@ import { analyzeStudent, score, status, weakTopics, type Answers, type Question 
 type Submission = { id: string; student_name: string; answers: Answers }
 
 const mark = {
-  correct: { symbol: '✓', cls: 'text-green-700' },
-  wrong: { symbol: '✗', cls: 'text-red-700' },
-  blank: { symbol: '–', cls: 'text-gray-500' },
+  correct: { symbol: '✓', cls: 'text-ok' },
+  wrong: { symbol: '✗', cls: 'text-warn' },
+  blank: { symbol: '–', cls: 'text-muted' },
 }
 
 export default function Results() {
@@ -53,25 +53,35 @@ export default function Results() {
     )
 
   return (
-    <main className="mx-auto max-w-5xl space-y-4 p-4">
-      <Link to={`/t/${groupId}`} className="text-blue-700 underline">
+    <main className="mx-auto max-w-[1024px] space-y-4 p-4">
+      <Link to={`/t/${groupId}`} className="inline-flex min-h-12 items-center text-primary underline underline-offset-4">
         ← Quizlər
       </Link>
       <h1 className="text-2xl font-bold">{title || 'Nəticələr'}</h1>
-      {failed && <p className="text-red-600">Xəta baş verdi. Səhifəni yeniləyin.</p>}
-      {!failed && submissions === null && <p>Yüklənir…</p>}
-      {deleteFailed && <p className="text-red-600">Silmək alınmadı.</p>}
-      {submissions?.length === 0 && <p>Hələ cavab yoxdur.</p>}
+      {failed && (
+        <p role="alert" className="rounded-input bg-warn-bg p-3 text-warn">
+          Xəta baş verdi. Səhifəni yeniləyin.
+        </p>
+      )}
+      {!failed && submissions === null && <p className="text-muted">Yüklənir…</p>}
+      {deleteFailed && (
+        <p role="alert" className="rounded-input bg-warn-bg p-3 text-warn">
+          Silmək alınmadı.
+        </p>
+      )}
+      {submissions?.length === 0 && <p className="text-muted">Hələ cavab yoxdur.</p>}
       {submissions && submissions.length > 0 && (
         <>
           <ClassMap quizId={quizId} questions={questions} students={submissions} />
-          <div className="overflow-x-auto">
+          <section className="card space-y-3 p-0">
+            <h2 className="px-5 pt-5 text-lg font-semibold">Şagirdlər</h2>
+            <div className="overflow-x-auto px-5 pb-5">
             <table className="w-full border-collapse text-center text-sm">
               <thead>
-                <tr className="border-b-2 border-gray-300">
-                  <th className="p-2 text-left">Şagird</th>
+                <tr className="border-b-2 border-line">
+                  <th className="sticky left-0 bg-card p-2 text-left">Şagird</th>
                   {questions.map((q) => (
-                    <th key={q.id} className="p-2" title={q.text}>
+                    <th key={q.id} className="mono p-2" title={q.text}>
                       {q.position}
                     </th>
                   ))}
@@ -82,11 +92,11 @@ export default function Results() {
               </thead>
               <tbody>
                 {submissions.map((s) => (
-                  <tr key={s.id} className="border-b border-gray-200">
-                    <td className="p-2 text-left font-medium">
+                  <tr key={s.id} className="border-b border-line">
+                    <td className="sticky left-0 whitespace-nowrap bg-card p-2 text-left font-semibold">
                       {s.student_name}
                       {analyzeStudent(questions, s.answers).timeRanOut && (
-                        <span className="block text-xs font-normal text-gray-500">vaxt çatmayıb</span>
+                        <span className="block text-xs font-normal text-muted">vaxt çatmayıb</span>
                       )}
                     </td>
                     {questions.map((q) => {
@@ -97,12 +107,17 @@ export default function Results() {
                         </td>
                       )
                     })}
-                    <td className="p-2 font-semibold">
+                    <td className="mono whitespace-nowrap p-2">
                       {score(questions, s.answers)} / {questions.length}
                     </td>
-                    <td className="p-2 text-left">{weakTopics(questions, s.answers).map(topicName).join(', ') || '—'}</td>
+                    <td className={`p-2 text-left ${weakTopics(questions, s.answers).length ? 'bg-warn-bg text-warn' : ''}`}>
+                      {weakTopics(questions, s.answers).map(topicName).join(', ') || '—'}
+                    </td>
                     <td className="p-2">
-                      <button onClick={() => remove(s.id)} className="rounded-lg border border-red-600 px-3 py-1 text-red-700">
+                      <button
+                        onClick={() => remove(s.id)}
+                        className="btn min-h-12 border-2 border-warn bg-card px-4 text-warn hover:bg-warn-bg"
+                      >
                         Sil
                       </button>
                     </td>
@@ -110,19 +125,19 @@ export default function Results() {
                 ))}
               </tbody>
               <tfoot>
-                <tr className="border-t-2 border-gray-300 font-semibold">
-                  <td className="p-2 text-left">Yanlış %</td>
+                <tr className="border-t-2 border-line font-semibold">
+                  <td className="sticky left-0 bg-card p-2 text-left">Yanlış %</td>
                   {questions.map((q) => (
-                    <td key={q.id} className="p-2">
+                    <td key={q.id} className="mono p-2">
                       {percent(q, 'wrong')}%
                     </td>
                   ))}
                   <td colSpan={3} />
                 </tr>
                 <tr className="font-semibold">
-                  <td className="p-2 text-left">Boş %</td>
+                  <td className="sticky left-0 bg-card p-2 text-left">Boş %</td>
                   {questions.map((q) => (
-                    <td key={q.id} className="p-2">
+                    <td key={q.id} className="mono p-2">
                       {percent(q, 'blank')}%
                     </td>
                   ))}
@@ -130,21 +145,22 @@ export default function Results() {
                 </tr>
               </tfoot>
             </table>
-          </div>
-          <section className="space-y-2">
-            <h2 className="font-semibold">Ehtimal olunan səbəblər</h2>
+            </div>
+          </section>
+          <section className="card space-y-3">
+            <h2 className="text-lg font-semibold">Ehtimal olunan səbəblər</h2>
             {submissions.map((s) => {
               const { missed, strong } = analyzeStudent(questions, s.answers)
               if (missed.length === 0) return null
               return (
-                <details key={s.id} className="rounded-xl border border-gray-300 p-3">
-                  <summary className="cursor-pointer font-medium">
+                <details key={s.id} className="rounded-input border border-line p-3">
+                  <summary className="flex min-h-12 cursor-pointer items-center font-semibold">
                     {s.student_name}
-                    {strong.length > 0 && <span className="ml-2 text-amber-700">güclü siqnal</span>}
+                    {strong.length > 0 && <span className="chip ml-2">güclü siqnal</span>}
                   </summary>
                   <div className="mt-2 space-y-2">
                     {strong.map((x) => (
-                      <p key={x.reason} className="text-amber-700">
+                      <p key={x.reason} className="rounded-input bg-warn-bg px-3 py-2 text-warn">
                         Güclü siqnal: ehtimal eyni səhv {x.count} dəfə təkrarlanıb — {x.reason}
                       </p>
                     ))}
@@ -156,10 +172,10 @@ export default function Results() {
               )
             })}
           </section>
-          <ol className="space-y-1 text-sm text-gray-700">
+          <ol className="card space-y-1 text-sm text-muted">
             {questions.map((q) => (
               <li key={q.id}>
-                {q.position}. {q.text} <span className="text-gray-500">({topicName(q.topic)})</span>
+                {q.position}. {q.text} <span className="text-muted">({topicName(q.topic)})</span>
               </li>
             ))}
           </ol>
