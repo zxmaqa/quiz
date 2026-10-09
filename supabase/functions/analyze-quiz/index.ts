@@ -563,7 +563,10 @@ async function handleClassSummary(input: { stats?: unknown; quiz_id?: string; mo
   const allowedNumbers = new Set(
     stats.flatMap((t) => [t.questions, t.students, t.weak_students, t.avg_accuracy].map(String)),
   )
-  const onlyInputNumbers = (text: string) => numbers(text).every((n) => allowedNumbers.has(n))
+  // topic labels (for example "K07") contain digits that are not statistics, so they are removed first
+  const withoutTopics = (text: string) =>
+    stats.reduce((t, s) => t.split(s.topic).join(' '), text).replace(/Kd{2}/g, ' ')
+  const onlyInputNumbers = (text: string) => numbers(withoutTopics(text)).every((n) => allowedNumbers.has(n))
   const focus = (Array.isArray(data.focus_topics) ? data.focus_topics : [])
     // deno-lint-ignore no-explicit-any
     .map((f: any) => ({ f, stat: stats.find((t) => t.topic === f?.topic) }))

@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import ClassMap from '../components/ClassMap'
 import MissedItem from '../components/MissedItem'
 import { topicName } from '../lib/topicNames'
 import { analyzeStudent, score, status, weakTopics, type Answers, type Question } from '../lib/scoring'
@@ -63,6 +64,7 @@ export default function Results() {
       {submissions?.length === 0 && <p>Hələ cavab yoxdur.</p>}
       {submissions && submissions.length > 0 && (
         <>
+          <ClassMap quizId={quizId} questions={questions} students={submissions} />
           <div className="overflow-x-auto">
             <table className="w-full border-collapse text-center text-sm">
               <thead>

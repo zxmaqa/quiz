@@ -190,25 +190,33 @@ function Result({ quiz, questions, answers }: { quiz: Quiz; questions: Question[
         Nəticə: {score(questions, answers)} / {questions.length}
       </p>
       <section>
-        <h2 className="font-semibold">Zəif mövzular</h2>
+        <h2 className="font-semibold">Bu mövzular üzərində işlə</h2>
         <p>{weak.length ? weak.map(topicName).join(', ') : 'Zəif mövzu yoxdur.'}</p>
       </section>
-      {strong.length > 0 && (
-        <section>
-          <h2 className="font-semibold">Güclü siqnal</h2>
-          {strong.map((s) => (
-            <p key={s.reason}>
-              Ehtimal, eyni səhv {s.count} dəfə təkrarlanıb: {s.reason}
-            </p>
+      {missed.length > 0 && (
+        <section className="space-y-3">
+          <h2 className="font-semibold">Səhv və ya boş cavablar</h2>
+          {missed.map((m) => (
+            <MissedItem key={m.q.id} item={m} answerLabel="Sizin cavab" showReason={false} />
           ))}
         </section>
       )}
-      {missed.length > 0 && (
-        <section className="space-y-3">
-          <h2 className="font-semibold">Səhv cavablar</h2>
-          {missed.map((m) => (
-            <MissedItem key={m.q.id} item={m} answerLabel="Sizin cavab" />
+      {missed.some((m) => m.misconception) && (
+        <section className="space-y-2">
+          <h2 className="font-semibold">Ehtimal olunan səbəblər</h2>
+          {strong.map((s) => (
+            <p key={s.reason} className="text-sm">
+              Güclü siqnal: ehtimal, eyni səhv {s.count} dəfə təkrarlanıb: {s.reason}
+            </p>
           ))}
+          {missed
+            .filter((m) => m.misconception)
+            .map((m) => (
+              <p key={m.q.id} className="text-sm text-gray-700">
+                {m.q.position}. {m.misconception!.reason}
+                {m.misconception!.calculation && <> (ehtimal olunan hesablama: {m.misconception!.calculation})</>}
+              </p>
+            ))}
         </section>
       )}
     </main>

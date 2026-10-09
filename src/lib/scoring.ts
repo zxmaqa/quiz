@@ -97,3 +97,35 @@ export function analyzeStudent(questions: Question[], answers: Answers) {
 
   return { missed, timeRanOut, strong }
 }
+
+export type TopicRow = {
+  topic: string
+  questions: number
+  cells: { name: string; accuracy: number; weak: boolean }[]
+  weakCount: number
+  avgAccuracy: number
+}
+
+// Class map: accuracy per topic per student, built in code. A cell is weak by the same rule as weakTopics.
+export function classMap(questions: Question[], students: { student_name: string; answers: Answers }[]): TopicRow[] {
+  const topics = [...new Set(questions.map((q) => q.topic).filter((t) => t && t !== UNSURE))]
+  return topics.map((topic) => {
+    const inTopic = questions.filter((q) => q.topic === topic)
+    const cells = students.map((s) => {
+      const correct = inTopic.filter((q) => status(q, s.answers) === 'correct').length
+      return {
+        name: s.student_name,
+        accuracy: Math.round((100 * correct) / inTopic.length),
+        weak: weakTopics(questions, s.answers).includes(topic),
+      }
+    })
+    const avg = cells.length ? cells.reduce((sum, c) => sum + c.accuracy, 0) / cells.length : 0
+    return {
+      topic,
+      questions: inTopic.length,
+      cells,
+      weakCount: cells.filter((c) => c.weak).length,
+      avgAccuracy: Math.round(avg),
+    }
+  })
+}
