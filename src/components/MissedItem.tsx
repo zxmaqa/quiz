@@ -1,6 +1,14 @@
 import type { Missed } from '../lib/scoring'
 
-export default function MissedItem({ item, answerLabel }: { item: Missed; answerLabel: string }) {
+export default function MissedItem({
+  item,
+  answerLabel,
+  showReason = true,
+}: {
+  item: Missed
+  answerLabel: string
+  showReason?: boolean
+}) {
   const { q, chosen, misconception, ranOut } = item
   const textOf = (label: string) => q.options.find((o) => o.label === label)?.text ?? ''
 
@@ -29,10 +37,9 @@ export default function MissedItem({ item, answerLabel }: { item: Missed; answer
           </ol>
         </div>
       )}
-      {misconception && (
+      {showReason && misconception && (
         <p className="text-sm text-gray-700">
           Ehtimal olunan səbəb: {misconception.reason}
-          {misconception.unchecked && <> (yoxlanılmayıb)</>}
           {misconception.calculation && <> (ehtimal olunan hesablama: {misconception.calculation})</>}
         </p>
       )}

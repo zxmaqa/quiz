@@ -33,6 +33,37 @@ export async function writeReasons(
   )
 }
 
+// Verified worked solutions for numeric questions (solve mode). The function verifies every step in code;
+// a question without a verified solution comes back as null and nothing is stored for it.
+export async function solve(
+  questions: { position: number; text: string; options: Option[]; correct_label: string }[],
+  quizId?: string,
+): Promise<Record<number, string[] | null>> {
+  const data = await call({ step: 'solve', questions, quiz_id: quizId })
+  return Object.fromEntries(
+    data.questions.map((q: { position: number; solution: string[] | null }) => [q.position, q.solution ?? null]),
+  )
+}
+
+// Runs solve for saved questions and stores the verified steps. Returns false if the AI call failed.
+export async function solveAndStore(
+  quizId: string,
+  questions: { id: string; position: number; text: string; options: Option[]; correct_label: string }[],
+): Promise<boolean> {
+  try {
+    const solutions = await solve(
+      questions.map(({ position, text, options, correct_label }) => ({ position, text, options, correct_label })),
+      quizId,
+    )
+    const results = await Promise.all(
+      questions.map((q) => supabase.from('questions').update({ solution: solutions[q.position] ?? null }).eq('id', q.id)),
+    )
+    return !results.some((r) => r.error)
+  } catch {
+    return false
+  }
+}
+
 // The correct option is not a misconception, so it never keeps an entry.
 export function withoutCorrect(m: Record<string, Misconception>, correct: string) {
   const rest = Object.fromEntries(Object.entries(m).filter(([label]) => label !== correct))

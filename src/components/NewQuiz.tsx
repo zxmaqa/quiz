@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { extract, withoutCorrect, writeReasons, type Extracted } from '../lib/ai'
+import { extract, solveAndStore, withoutCorrect, writeReasons, type Extracted } from '../lib/ai'
 import { supabase } from '../lib/supabase'
 import { UNSURE, type Misconception } from '../lib/scoring'
 import { topicLabel } from '../lib/topicNames'
@@ -66,7 +66,7 @@ export default function NewQuiz({ groupId, onSaved }: { groupId: string; onSaved
       setBusy(false)
       return
     }
-    const { error: qError } = await supabase.from('questions').insert(
+    const { data: saved, error: qError } = await supabase.from('questions').insert(
       draft.map((q, i) => ({
         quiz_id: quiz.id,
         position: i + 1,
@@ -76,7 +76,7 @@ export default function NewQuiz({ groupId, onSaved }: { groupId: string; onSaved
         correct_label: q.correct,
         misconceptions: q.misconceptions ? withoutCorrect(q.misconceptions, q.correct!) : null,
       })),
-    )
+    ).select('id,position,text,options,correct_label')
     const { error: liveError } = qError
       ? { error: qError }
       : await supabase.from('quizzes').update({ status: 'live' }).eq('id', quiz.id)
@@ -86,6 +86,8 @@ export default function NewQuiz({ groupId, onSaved }: { groupId: string; onSaved
       setBusy(false)
       return
     }
+    // verified solutions are written in the background once the correct answers are saved
+    if (saved) void solveAndStore(quiz.id, saved)
     setBusy(false)
     onSaved()
   }

@@ -7,8 +7,17 @@ import {
   PROMPT_VERSION as KIMYA_PROMPT_VERSION,
 } from './prompt_kimya.ts'
 import { KIMYA_TOPICS } from './topics_kimya.ts'
+import { ATOMIC_MASSES, SOLUTION_CONSTANTS } from './atomic_masses.ts'
+import {
+  buildSolvePrompt,
+  buildSummaryPrompt,
+  PROMPT_VERSION as SOLVE_PROMPT_VERSION,
+  SUMMARY_PROMPT_VERSION,
+  type TopicStat,
+} from './prompt_solve.ts'
 
 const DEFAULT_MODEL = 'claude-haiku-4-5'
+const SOLVE_MODEL = 'claude-sonnet-4-6'
 const FALLBACK_MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash-lite']
 const RETRY_STATUS = [429, 500, 503, 529]
 const MAX_TEXT = 20000
@@ -36,11 +45,11 @@ const extractJson = (raw: string) => {
   return from !== -1 && (fromArr === -1 || from < fromArr) ? raw.slice(from, to + 1) : raw.slice(fromArr, toArr + 1)
 }
 
-function parseModelJson(raw: string): CallResult {
+function parseModelJson(raw: string, shapeKey = 'questions'): CallResult {
   try {
     const parsed = JSON.parse(extractJson(raw))
-    const data = Array.isArray(parsed) ? { questions: parsed } : parsed
-    return Array.isArray(data?.questions)
+    const data = Array.isArray(parsed) ? { [shapeKey]: parsed } : parsed
+    return Array.isArray(data?.[shapeKey])
       ? { ok: true, data }
       : { ok: false, status: 502, error: `Unexpected shape: ${raw.slice(0, 300)}` }
   } catch {
@@ -54,6 +63,7 @@ async function callModel(
   prompt: string,
   kind: string,
   quizId: string | null,
+  shapeKey = 'questions',
 ): Promise<{ result: CallResult; logId: string }> {
   const started = Date.now()
   const logId = crypto.randomUUID()
@@ -84,7 +94,7 @@ async function callModel(
       } else {
         // deno-lint-ignore no-explicit-any
         const raw = (body?.content ?? []).map((c: any) => c.text ?? '').join('')
-        result = parseModelJson(raw)
+        result = parseModelJson(raw, shapeKey)
       }
     } else {
       const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
@@ -105,7 +115,7 @@ async function callModel(
       } else {
         // deno-lint-ignore no-explicit-any
         const raw = (body?.candidates?.[0]?.content?.parts ?? []).map((p: any) => p.text ?? '').join('')
-        result = parseModelJson(raw)
+        result = parseModelJson(raw, shapeKey)
       }
     }
   } catch (e) {
@@ -408,6 +418,184 @@ function parseQuestions(raw: any): QuizQuestion[] | null {
   return JSON.stringify(out).length > MAX_TEXT ? null : out
 }
 
+// ---- solve / class-summary (new modes; the extract/reasons paths above are unchanged) ------------------
+
+const ratKey = (r: Rat) => `${r.n}/${r.d}`
+
+// Same retry and fallbacks as the other modes.
+async function runChain(primary: string, prompt: string, kind: string, quizId: string | null, shapeKey: string) {
+  let used = primary
+  let { result, logId } = await callModel(primary, prompt, kind, quizId, shapeKey)
+  if (!result.ok && RETRY_STATUS.includes(result.status)) {
+    await sleep(2000)
+    ;({ result, logId } = await callModel(primary, prompt, kind, quizId, shapeKey))
+    for (const fallback of FALLBACK_MODELS.filter((m) => m !== primary)) {
+      if (result.ok) break
+      used = fallback
+      ;({ result, logId } = await callModel(fallback, prompt, kind, quizId, shapeKey))
+    }
+  }
+  return { result, logId, used }
+}
+
+// Every step is evaluated with the existing evaluator. A step may only use numbers from the question, the fixed
+// atomic masses, 100/1000/22.4 and earlier step values. The final value must equal the last step and the value
+// of the teacher's correct option. Returns the steps, or the reason the solution is not stored.
+function verifySolve(steps: unknown, final: unknown, q: QuizQuestion): { steps: string[] } | { failure: string } {
+  if (
+    !Array.isArray(steps) ||
+    steps.length === 0 ||
+    steps.length > 12 ||
+    steps.some((x) => typeof x !== 'string' || !x.trim() || x.length > 200)
+  ) {
+    return { failure: 'bad_format' }
+  }
+  const target = optionValue(q.options.find((o) => o.label === q.correct_label)?.text ?? '')
+  if (!target) return { failure: 'correct_option_not_numeric' }
+
+  const allowed = new Set<string>()
+  for (const n of [...numbers(q.text), ...Object.values(ATOMIC_MASSES), ...SOLUTION_CONSTANTS]) {
+    const v = evaluate(n)
+    if (v) allowed.add(ratKey(v))
+  }
+  const out: string[] = []
+  let last: Rat | null = null
+  for (const raw of steps as string[]) {
+    const step = raw.trim()
+    if (step.includes('%')) return { failure: 'percent_sign' }
+    const parts = step.split('=').map((x) => x.trim())
+    if (parts.length < 2 || parts.some((x) => !x)) return { failure: 'step_format' }
+    const values = parts.map(evaluate)
+    if (values.some((v) => v === null)) return { failure: 'not_arithmetic' }
+    const vs = values as Rat[]
+    if (!vs.every((v) => eq(v, vs[0]))) return { failure: `steps_not_equal (${step})` }
+    const notAllowed = numbers(parts[0]).filter((n) => {
+      const v = evaluate(n)
+      return !v || !allowed.has(ratKey(v))
+    })
+    if (notAllowed.length) return { failure: `number_not_allowed (${notAllowed[0]})` }
+    allowed.add(ratKey(vs[0]))
+    last = vs[0]
+    out.push(step)
+  }
+  const finalValue = typeof final === 'string' || typeof final === 'number' ? evaluate(String(final)) : null
+  if (!finalValue || !last || !eq(finalValue, last)) return { failure: 'final_not_last_step' }
+  if (!eq(finalValue, target)) return { failure: `final_value_mismatch (${fmt(finalValue)} vs correct ${fmt(target)})` }
+  return { steps: out }
+}
+
+async function handleSolve(input: { questions?: unknown; quiz_id?: string; model?: string }) {
+  const questions = parseQuestions(input.questions)
+  if (!questions) return json({ error: 'questions with position, text, options and correct_label are required' }, 400)
+  const quizId = input.quiz_id ?? null
+  // Only questions where every option is a plain number can have a verified solution.
+  const numeric = questions.filter((q) => q.options.every((o) => optionValue(o.text) !== null))
+  const status: Record<string, string> = {}
+  const solutions: Record<string, string[] | null> = {}
+  for (const q of questions) {
+    solutions[q.position] = null
+    if (!numeric.includes(q)) status[q.position] = 'not_numeric'
+  }
+  let used = input.model ?? SOLVE_MODEL
+  if (numeric.length > 0) {
+    const run = await runChain(used, buildSolvePrompt(numeric), 'solve', quizId, 'questions')
+    used = run.used
+    if (!run.result.ok) return json({ error: run.result.error }, 502)
+    // deno-lint-ignore no-explicit-any
+    const rows = (run.result.data as any).questions as any[]
+    for (const q of numeric) {
+      const row = rows.find((r) => r?.position === q.position)
+      if (!row) {
+        status[q.position] = 'hidden: no_solution'
+        continue
+      }
+      const v = verifySolve(row.solution_steps, row.final, q)
+      if ('steps' in v) {
+        solutions[q.position] = v.steps
+        status[q.position] = 'verified'
+      } else {
+        status[q.position] = `hidden: ${v.failure}`
+      }
+    }
+    await db
+      .from('ai_calls')
+      .update({ details: { step: 'solve', prompt_version: SOLVE_PROMPT_VERSION, solution_status: status } })
+      .eq('id', run.logId)
+  }
+  return json({
+    step: 'solve',
+    questions: questions.map((q) => ({ position: q.position, solution: solutions[q.position] })),
+    solution_status: status,
+    model: used,
+    prompt_version: SOLVE_PROMPT_VERSION,
+  })
+}
+
+// deno-lint-ignore no-explicit-any
+function parseStats(raw: any): TopicStat[] | null {
+  if (!Array.isArray(raw) || raw.length === 0 || raw.length > 40) return null
+  const out: TopicStat[] = []
+  for (const t of raw) {
+    if (typeof t?.topic !== 'string' || !t.topic.trim() || t.topic.length > 120) return null
+    const nums = [t.questions, t.students, t.weak_students, t.avg_accuracy]
+    if (nums.some((n) => !Number.isFinite(n) || n < 0 || n > 100000)) return null
+    out.push({
+      topic: t.topic,
+      questions: t.questions,
+      students: t.students,
+      weak_students: t.weak_students,
+      avg_accuracy: t.avg_accuracy,
+    })
+  }
+  return out
+}
+
+async function handleClassSummary(input: { stats?: unknown; quiz_id?: string; model?: string }) {
+  const stats = parseStats(input.stats)
+  if (!stats) return json({ error: 'stats (per-topic numbers) are required' }, 400)
+  const quizId = input.quiz_id ?? null
+  const run = await runChain(input.model ?? DEFAULT_MODEL, buildSummaryPrompt(stats), 'class-summary', quizId, 'focus_topics')
+  if (!run.result.ok) return json({ error: run.result.error }, 502)
+  // deno-lint-ignore no-explicit-any
+  const data = run.result.data as any
+
+  // Only numbers from the input may appear in the text; students_weak always comes from the input.
+  const allowedNumbers = new Set(
+    stats.flatMap((t) => [t.questions, t.students, t.weak_students, t.avg_accuracy].map(String)),
+  )
+  const onlyInputNumbers = (text: string) => numbers(text).every((n) => allowedNumbers.has(n))
+  const focus = (Array.isArray(data.focus_topics) ? data.focus_topics : [])
+    // deno-lint-ignore no-explicit-any
+    .map((f: any) => ({ f, stat: stats.find((t) => t.topic === f?.topic) }))
+    // deno-lint-ignore no-explicit-any
+    .filter(({ f, stat }: any) => stat && stat.weak_students > 0 && typeof f?.why === 'string' && onlyInputNumbers(f.why))
+    // deno-lint-ignore no-explicit-any
+    .map(({ f, stat }: any) => ({ topic: stat.topic, students_weak: stat.weak_students, why: f.why.trim() }))
+    .slice(0, 3)
+  const plan = (Array.isArray(data.next_lesson_plan) ? data.next_lesson_plan : [])
+    .filter((x: unknown) => typeof x === 'string' && x.trim() && onlyInputNumbers(x))
+    .map((x: string) => x.trim())
+    .slice(0, 4)
+  const summary = { focus_topics: focus, next_lesson_plan: plan }
+
+  await db
+    .from('ai_calls')
+    .update({
+      details: { step: 'class-summary', prompt_version: SUMMARY_PROMPT_VERSION, kept: { focus: focus.length, plan: plan.length } },
+    })
+    .eq('id', run.logId)
+  // cache per quiz
+  if (quizId) {
+    await db
+      .from('quizzes')
+      .update({
+        class_summary: { summary, model: run.used, prompt_version: SUMMARY_PROMPT_VERSION, at: new Date().toISOString() },
+      })
+      .eq('id', quizId)
+  }
+  return json({ step: 'class-summary', summary, model: run.used, prompt_version: SUMMARY_PROMPT_VERSION })
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') return new Response('ok', { headers: cors })
   if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405)
@@ -419,7 +607,14 @@ Deno.serve(async (req) => {
     return json({ error: 'Invalid JSON body' }, 400)
   }
   const { quiz_id, group_id, text, model, step } = input ?? {}
-  if (step !== 'extract' && step !== 'reasons') return json({ error: 'step must be "extract" or "reasons"' }, 400)
+  if (step === 'solve' || step === 'class-summary') {
+    if (model != null && !/^[A-Za-z0-9._-]+$/.test(model)) return json({ error: 'Invalid model' }, 400)
+    if (quiz_id != null && !/^[0-9a-f-]{36}$/i.test(quiz_id)) return json({ error: 'Invalid quiz_id' }, 400)
+    return step === 'solve' ? handleSolve(input) : handleClassSummary(input)
+  }
+  if (step !== 'extract' && step !== 'reasons') {
+    return json({ error: 'step must be "extract", "reasons", "solve" or "class-summary"' }, 400)
+  }
   if (model != null && !/^[A-Za-z0-9._-]+$/.test(model)) return json({ error: 'Invalid model' }, 400)
   if (quiz_id != null && !/^[0-9a-f-]{36}$/i.test(quiz_id)) return json({ error: 'Invalid quiz_id' }, 400)
   if (group_id != null && !/^[0-9a-f-]{36}$/i.test(group_id)) return json({ error: 'Invalid group_id' }, 400)

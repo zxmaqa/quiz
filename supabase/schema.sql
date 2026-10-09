@@ -57,6 +57,9 @@ alter table groups add column if not exists subject text default 'math';
 -- solution: verified worked solution steps (chemistry numeric questions only), ["expr = value", ...] or null
 alter table questions add column if not exists solution jsonb;
 
+-- class_summary: cached AI class summary for the teacher results page (class-summary mode)
+alter table quizzes add column if not exists class_summary jsonb;
+
 alter table groups enable row level security;
 alter table quizzes enable row level security;
 alter table questions enable row level security;

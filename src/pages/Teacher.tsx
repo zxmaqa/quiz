@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { Link, useParams } from 'react-router-dom'
 import NewQuiz from '../components/NewQuiz'
-import { extract, withoutCorrect, writeReasons } from '../lib/ai'
+import { extract, solveAndStore, withoutCorrect, writeReasons } from '../lib/ai'
 import type { Question } from '../lib/scoring'
 import { supabase } from '../lib/supabase'
 
@@ -71,7 +71,9 @@ export default function Teacher() {
             .eq('id', q.id)
         }),
       )
-      note(results.some((r) => r.error) ? 'Yadda saxlamaq alınmadı.' : 'AI analiz tamamlandı.')
+      // verified worked solutions (solve mode)
+      const solved = await solveAndStore(quizId, questions)
+      note(results.some((r) => r.error) || !solved ? 'Yadda saxlamaq alınmadı.' : 'AI analiz tamamlandı.')
     } catch {
       note('AI xətası. Bir az sonra yenidən cəhd edin.')
     }
