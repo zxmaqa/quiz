@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { Link, useParams } from 'react-router-dom'
 import NewQuiz from '../components/NewQuiz'
-import { analyze, withoutCorrect } from '../lib/ai'
+import { extract, withoutCorrect, writeReasons } from '../lib/ai'
 import type { Question } from '../lib/scoring'
 import { supabase } from '../lib/supabase'
 
@@ -46,19 +46,30 @@ export default function Teacher() {
       const text = questions
         .map((q) => `${q.position}. ${q.text}\n${q.options.map((o) => `${o.label}) ${o.text}`).join('\n')}`)
         .join('\n\n')
-      const result = await analyze(text, quizId)
-      const updates = questions.flatMap((q) => {
-        const ai = result.questions.find((a) => a.position === q.position)
-        return ai
-          ? [
-              supabase
-                .from('questions')
-                .update({ topic: ai.topic, misconceptions: withoutCorrect(ai.misconceptions, q.correct_label) })
-                .eq('id', q.id),
-            ]
-          : []
-      })
-      const results = await Promise.all(updates)
+      // call 1 fills topics, call 2 gets the stored correct answers and writes the reasons
+      const topics = await extract(text)
+      const reasons = await writeReasons(
+        questions.map((q) => ({
+          position: q.position,
+          text: q.text,
+          options: q.options,
+          correct_label: q.correct_label,
+        })),
+        quizId,
+      )
+      const results = await Promise.all(
+        questions.map((q) => {
+          const topic = topics.questions.find((a) => a.position === q.position)?.topic
+          const m = reasons[q.position]
+          return supabase
+            .from('questions')
+            .update({
+              ...(topic ? { topic } : {}),
+              misconceptions: m ? withoutCorrect(m, q.correct_label) : null,
+            })
+            .eq('id', q.id)
+        }),
+      )
       note(results.some((r) => r.error) ? 'Yadda saxlamaq alınmadı.' : 'AI analiz tamamlandı.')
     } catch {
       note('AI xətası. Bir az sonra yenidən cəhd edin.')

@@ -48,6 +48,9 @@ create table if not exists ai_calls (
   created_at timestamptz default now()
 );
 
+-- details: for step "reasons", why each wrong option ended as unknown (model_unknown | check_failed: <reason>)
+alter table ai_calls add column if not exists details jsonb;
+
 alter table groups enable row level security;
 alter table quizzes enable row level security;
 alter table questions enable row level security;

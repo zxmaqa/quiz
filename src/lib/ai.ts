@@ -1,23 +1,35 @@
 import { supabase } from './supabase'
 import type { Misconception, Option } from './scoring'
 
-export type AiQuestion = {
-  position: number
-  text: string
-  options: Option[]
-  topic: string
-  misconceptions: Record<string, Misconception>
+export type Extracted = { position: number; text: string; options: Option[]; topic: string }
+
+export type ReasonInput = { position: number; text: string; options: Option[]; correct_label: string }
+
+// deno-lint-ignore no-explicit-any
+async function call(body: Record<string, unknown>): Promise<any> {
+  const { data, error } = await supabase.functions.invoke('analyze-quiz', { body })
+  if (error || !Array.isArray(data?.questions)) throw new Error('analyze failed')
+  return data
 }
 
-export type Analysis = { questions: AiQuestion[]; topics: string[] }
+// Call 1: questions, options and topics only. Only the quiz text is sent, never student data.
+export async function extract(text: string): Promise<{ questions: Extracted[]; topics: string[] }> {
+  return call({ step: 'extract', text })
+}
 
-// Only the quiz text is sent. Never student data.
-export async function analyze(text: string, quizId?: string): Promise<Analysis> {
-  const { data, error } = await supabase.functions.invoke('analyze-quiz', {
-    body: { text, quiz_id: quizId },
-  })
-  if (error || !Array.isArray(data?.questions)) throw new Error('analyze failed')
-  return data as Analysis
+// Call 2: reasons for the wrong options. Receives the correct label of every question and
+// never returns an entry for the correct option. Result is keyed by question position.
+export async function writeReasons(
+  questions: ReasonInput[],
+  quizId?: string,
+): Promise<Record<number, Record<string, Misconception>>> {
+  const data = await call({ step: 'reasons', questions, quiz_id: quizId })
+  return Object.fromEntries(
+    data.questions.map((q: { position: number; misconceptions: Record<string, Misconception> }) => [
+      q.position,
+      q.misconceptions,
+    ]),
+  )
 }
 
 // The correct option is not a misconception, so it never keeps an entry.

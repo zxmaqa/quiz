@@ -1,9 +1,9 @@
 import { useState } from 'react'
-import { analyze, withoutCorrect, type AiQuestion } from '../lib/ai'
+import { extract, withoutCorrect, writeReasons, type Extracted } from '../lib/ai'
 import { supabase } from '../lib/supabase'
-import { UNSURE } from '../lib/scoring'
+import { UNSURE, type Misconception } from '../lib/scoring'
 
-type Draft = AiQuestion & { correct: string | null }
+type Draft = Extracted & { correct: string | null; misconceptions: Record<string, Misconception> | null }
 
 export default function NewQuiz({ groupId, onSaved }: { groupId: string; onSaved: () => void }) {
   const [title, setTitle] = useState('')
@@ -17,13 +17,29 @@ export default function NewQuiz({ groupId, onSaved }: { groupId: string; onSaved
     setBusy(true)
     setError('')
     try {
-      const res = await analyze(text)
+      const res = await extract(text)
       if (res.questions.length === 0) {
         setError('Mətndə sual tapılmadı.')
       } else {
         setTopics(res.topics)
-        setDraft(res.questions.map((q) => ({ ...q, correct: null })))
+        setDraft(res.questions.map((q) => ({ ...q, correct: null, misconceptions: null })))
       }
+    } catch {
+      setError('AI xətası. Bir az sonra yenidən cəhd edin.')
+    }
+    setBusy(false)
+  }
+
+  // Call 2: needs the correct option of every question. Failing here never blocks saving.
+  async function writeAllReasons() {
+    if (!draft) return
+    setBusy(true)
+    setError('')
+    try {
+      const reasons = await writeReasons(
+        draft.map((q, i) => ({ position: i + 1, text: q.text, options: q.options, correct_label: q.correct! })),
+      )
+      setDraft((d) => d && d.map((q, i) => ({ ...q, misconceptions: reasons[i + 1] ?? null })))
     } catch {
       setError('AI xətası. Bir az sonra yenidən cəhd edin.')
     }
@@ -55,7 +71,7 @@ export default function NewQuiz({ groupId, onSaved }: { groupId: string; onSaved
         topic: q.topic,
         options: q.options,
         correct_label: q.correct,
-        misconceptions: withoutCorrect(q.misconceptions, q.correct!),
+        misconceptions: q.misconceptions ? withoutCorrect(q.misconceptions, q.correct!) : null,
       })),
     )
     const { error: liveError } = qError
@@ -128,11 +144,11 @@ export default function NewQuiz({ groupId, onSaved }: { groupId: string; onSaved
             ))}
           </select>
           {q.options.map((o) => {
-            const m = q.correct === o.label ? undefined : q.misconceptions[o.label]
+            const m = q.correct === o.label ? undefined : q.misconceptions?.[o.label]
             return (
               <div key={o.label}>
                 <button
-                  onClick={() => update(i, { correct: o.label })}
+                  onClick={() => update(i, { correct: o.label, misconceptions: null })}
                   className={`w-full rounded-lg border-2 p-3 text-left ${
                     q.correct === o.label ? 'border-green-700 bg-green-100' : 'border-gray-300'
                   }`}
@@ -154,6 +170,13 @@ export default function NewQuiz({ groupId, onSaved }: { groupId: string; onSaved
         </div>
       ))}
       {error && <p className="text-red-600">{error}</p>}
+      <button
+        disabled={busy || !ready}
+        onClick={writeAllReasons}
+        className="w-full rounded-xl border-2 border-blue-700 p-3 font-semibold text-blue-700 disabled:opacity-40"
+      >
+        {busy ? 'Gözləyin…' : 'Səbəbləri AI ilə yaz'}
+      </button>
       <button
         disabled={busy || !ready}
         onClick={save}

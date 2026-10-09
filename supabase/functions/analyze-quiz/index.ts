@@ -1,5 +1,5 @@
 import { createClient } from 'npm:@supabase/supabase-js@2'
-import { buildPrompt, PROMPT_VERSION } from './prompt.ts'
+import { buildExtractPrompt, buildReasonsPrompt, PROMPT_VERSION, type QuizQuestion } from './prompt.ts'
 import { TOPICS } from './topics.ts'
 
 const DEFAULT_MODEL = 'claude-haiku-4-5'
@@ -43,8 +43,14 @@ function parseModelJson(raw: string): CallResult {
 }
 
 // One model call (Claude or Gemini, chosen by model name). Every call is logged to ai_calls.
-async function callModel(model: string, prompt: string, quizId: string | null): Promise<CallResult> {
+async function callModel(
+  model: string,
+  prompt: string,
+  kind: string,
+  quizId: string | null,
+): Promise<{ result: CallResult; logId: string }> {
   const started = Date.now()
+  const logId = crypto.randomUUID()
   let result: CallResult
   let inputTokens: number | null = null
   let outputTokens: number | null = null
@@ -100,8 +106,9 @@ async function callModel(model: string, prompt: string, quizId: string | null): 
     result = { ok: false, status: 0, error: String(e) }
   }
   await db.from('ai_calls').insert({
+    id: logId,
     quiz_id: quizId,
-    kind: 'analyze-quiz',
+    kind,
     model,
     input_tokens: inputTokens,
     output_tokens: outputTokens,
@@ -109,70 +116,192 @@ async function callModel(model: string, prompt: string, quizId: string | null): 
     ok: result.ok,
     error: result.ok ? null : result.error.slice(0, 500),
   })
-  return result
+  return { result, logId }
 }
 
-const compact = (s: string) => s.replace(/\s+/g, '').replace(',', '.').toLowerCase()
+// ---- exact arithmetic (no eval) -------------------------------------------------------------
 
-// A calculation is only believable if it ends exactly on the option's value.
-const landsOn = (calculation: string, optionText: string) =>
-  compact(calculation.split('=').pop() ?? '') === compact(optionText)
+type Rat = { n: bigint; d: bigint }
+
+const gcd = (a: bigint, b: bigint): bigint => (b === 0n ? a : gcd(b, a % b))
+
+function rat(n: bigint, d: bigint): Rat | null {
+  if (d === 0n) return null
+  if (d < 0n) {
+    n = -n
+    d = -d
+  }
+  const g = gcd(n < 0n ? -n : n, d)
+  return g > 1n ? { n: n / g, d: d / g } : { n, d }
+}
+
+const eq = (a: Rat, b: Rat) => a.n * b.d === b.n * a.d
+const fmt = (r: Rat) => (r.d === 1n ? `${r.n}` : `${r.n}/${r.d}`)
+
+// Numbers, + - * / and parentheses only. Returns null for anything else or division by zero.
+function evaluate(src: string): Rat | null {
+  const s = src.replace(/[−–]/g, '-').replace(/[×·⋅]/g, '*').replace(/÷/g, '/')
+  const tokens = s.match(/\d+(?:[.,]\d+)?|[()+\-*/]|\S/g) ?? []
+  if (!tokens.length || tokens.length > 100) return null
+  let i = 0
+
+  const num = (t: string): Rat | null => {
+    const [a, b = ''] = t.replace(',', '.').split('.')
+    if (a.length + b.length > 15) return null
+    return rat(BigInt(a + b), 10n ** BigInt(b.length))
+  }
+  const primary = (): Rat | null => {
+    const t = tokens[i++]
+    if (t === undefined) return null
+    if (t === '(') {
+      const v = expr()
+      return v && tokens[i++] === ')' ? v : null
+    }
+    return /^\d/.test(t) ? num(t) : null
+  }
+  const unary = (): Rat | null => {
+    if (tokens[i] === '-') {
+      i++
+      const v = unary()
+      return v && { n: -v.n, d: v.d }
+    }
+    if (tokens[i] === '+') {
+      i++
+      return unary()
+    }
+    return primary()
+  }
+  const term = (): Rat | null => {
+    let l = unary()
+    while (l && (tokens[i] === '*' || tokens[i] === '/')) {
+      const op = tokens[i++]
+      const r = unary()
+      if (!r) return null
+      l = op === '*' ? rat(l.n * r.n, l.d * r.d) : rat(l.n * r.d, l.d * r.n)
+    }
+    return l
+  }
+  const expr = (): Rat | null => {
+    let l = term()
+    while (l && (tokens[i] === '+' || tokens[i] === '-')) {
+      const op = tokens[i++]
+      const r = term()
+      if (!r) return null
+      l = rat(op === '+' ? l.n * r.d + r.n * l.d : l.n * r.d - r.n * l.d, l.d * r.d)
+    }
+    return l
+  }
+
+  const v = expr()
+  return v && i === tokens.length ? v : null
+}
+
+// The option's own value: "4/12", "1.6", "20%", "60 manat".
+function optionValue(text: string): Rat | null {
+  const t = text.trim().replace(/%/g, '/100')
+  return evaluate(t) ?? evaluate(t.replace(/\s*[\p{L}.]+$/u, ''))
+}
 
 // The starting expression (before the first "=") may only use numbers from the question, plus 100 for percents.
 const numbers = (s: string) => s.match(/\d+(?:[.,]\d+)?/g)?.map((n) => n.replace(',', '.')) ?? []
-const usesQuestionNumbers = (calculation: string, questionText: string) => {
+const usesQuestionNumbers = (firstStep: string, questionText: string) => {
   const allowed = new Set([...numbers(questionText), '100'])
-  return numbers(calculation.split('=')[0]).every((n) => allowed.has(n))
+  return numbers(firstStep).every((n) => allowed.has(n))
 }
 
-// deno-lint-ignore no-explicit-any
-function cleanMisconceptions(raw: any, options: { label: string; text: string }[], questionText: string) {
-  const out: Record<string, { reason: string; calculation?: string | null; confidence?: string }> = {}
-  if (!raw || typeof raw !== 'object') return out
-  for (const [label, m] of Object.entries(raw)) {
-    if (!/^[A-Za-z]$/.test(label) || !m || typeof m !== 'object') continue
-    // deno-lint-ignore no-explicit-any
-    const { reason, calculation, confidence } = m as any
-    const option = options.find((o) => o.label === label.toUpperCase())
-    const hasCalc = typeof calculation === 'string' && calculation.trim()
-    if (
-      typeof reason !== 'string' ||
-      !reason.trim() ||
-      reason.trim().toLowerCase() === 'unknown' ||
-      (hasCalc && option && !landsOn(calculation, option.text)) ||
-      (hasCalc && !usesQuestionNumbers(calculation, questionText))
-    ) {
-      out[label.toUpperCase()] = { reason: 'unknown' }
-      continue
-    }
-    out[label.toUpperCase()] = {
-      reason: reason.trim(),
-      calculation: typeof calculation === 'string' && calculation.trim() ? calculation.trim() : null,
-      ...(['high', 'medium', 'low'].includes(confidence) ? { confidence } : {}),
-    }
-  }
-  return out
+// null = calculation accepted, otherwise the failure code.
+function checkCalculation(calculation: unknown, questionText: string, optionText: string): string | null {
+  if (typeof calculation !== 'string' || !calculation.trim()) return 'no_calculation'
+  if (calculation.includes('%')) return 'percent_sign'
+  const steps = calculation.split('=').map((s) => s.trim())
+  if (steps.some((s) => !s)) return 'empty_step'
+  const values = steps.map(evaluate)
+  if (values.some((v) => v === null)) return 'not_arithmetic'
+  const vs = values as Rat[]
+  if (!vs.every((v) => eq(v, vs[0]))) return `steps_not_equal (${vs.map(fmt).join(' vs ')})`
+  const option = optionValue(optionText)
+  if (!option) return 'option_not_numeric'
+  const last = vs[vs.length - 1]
+  if (!eq(last, option)) return `final_value_mismatch (${fmt(last)} vs option ${fmt(option)})`
+  if (!usesQuestionNumbers(steps[0], questionText)) return 'numbers_not_in_question'
+  return null
 }
 
+// ---- cleaning ---------------------------------------------------------------------------------
+
 // deno-lint-ignore no-explicit-any
-function cleanQuestions(data: any) {
-  if (!Array.isArray(data?.questions)) return null
+function cleanExtracted(data: any) {
   // deno-lint-ignore no-explicit-any
-  return data.questions.map((q: any, i: number) => {
+  return data.questions.map((q: any, i: number) => ({
+    position: Number.isInteger(q?.position) ? q.position : i + 1,
+    text: String(q?.text ?? ''),
     // deno-lint-ignore no-explicit-any
-    const options = (Array.isArray(q?.options) ? q.options : []).map((o: any) => ({
+    options: (Array.isArray(q?.options) ? q.options : []).map((o: any) => ({
       label: String(o?.label ?? '').toUpperCase(),
       text: String(o?.text ?? ''),
-    }))
-    const text = String(q?.text ?? '')
-    return {
-      position: Number.isInteger(q?.position) ? q.position : i + 1,
-      text,
-      options,
-      topic: TOPICS.includes(q?.topic) ? q.topic : 'UNSURE',
-      misconceptions: cleanMisconceptions(q?.misconceptions, options, text),
+    })),
+    topic: TOPICS.includes(q?.topic) ? q.topic : 'UNSURE',
+  }))
+}
+
+type Misconception = { reason: string; calculation?: string; confidence?: string }
+
+// Every wrong option gets either a checked reason or { reason: "unknown" } plus a recorded cause.
+// The correct option never gets an entry.
+// deno-lint-ignore no-explicit-any
+function cleanReasons(data: any, questions: QuizQuestion[]) {
+  const unknown: Record<string, Record<string, string>> = {}
+  const droppedCorrect: string[] = []
+  const out = questions.map((q) => {
+    // deno-lint-ignore no-explicit-any
+    const entry = data.questions.find((x: any) => x?.position === q.position)
+    const raw = entry?.misconceptions && typeof entry.misconceptions === 'object' ? entry.misconceptions : {}
+    const misconceptions: Record<string, Misconception> = {}
+    for (const o of q.options) {
+      const m = raw[o.label]
+      const reason = typeof m?.reason === 'string' ? m.reason.trim() : ''
+      const gaveReason = reason !== '' && reason.toLowerCase() !== 'unknown'
+      if (o.label === q.correct_label) {
+        if (gaveReason) droppedCorrect.push(`${q.position}${o.label}`)
+        continue
+      }
+      const markUnknown = (cause: string) => {
+        misconceptions[o.label] = { reason: 'unknown' }
+        ;(unknown[q.position] ??= {})[o.label] = cause
+      }
+      if (!gaveReason) {
+        markUnknown('model_unknown')
+        continue
+      }
+      const failure = checkCalculation(m.calculation, q.text, o.text)
+      if (failure) {
+        markUnknown(`check_failed: ${failure}`)
+        continue
+      }
+      misconceptions[o.label] = {
+        reason,
+        calculation: m.calculation.trim(),
+        ...(['high', 'medium', 'low'].includes(m.confidence) ? { confidence: m.confidence } : {}),
+      }
     }
+    return { position: q.position, misconceptions }
   })
+  return { questions: out, unknown, droppedCorrect }
+}
+
+// deno-lint-ignore no-explicit-any
+function parseQuestions(raw: any): QuizQuestion[] | null {
+  if (!Array.isArray(raw) || raw.length === 0 || raw.length > 50) return null
+  const out: QuizQuestion[] = []
+  for (const q of raw) {
+    if (!Number.isInteger(q?.position) || typeof q?.text !== 'string') return null
+    if (!/^[A-Z]$/.test(q?.correct_label ?? '')) return null
+    if (!Array.isArray(q?.options) || q.options.length < 2 || q.options.length > 10) return null
+    // deno-lint-ignore no-explicit-any
+    if (q.options.some((o: any) => !/^[A-Z]$/.test(o?.label ?? '') || typeof o?.text !== 'string')) return null
+    out.push({ position: q.position, text: q.text, options: q.options, correct_label: q.correct_label })
+  }
+  return JSON.stringify(out).length > MAX_TEXT ? null : out
 }
 
 Deno.serve(async (req) => {
@@ -185,31 +314,61 @@ Deno.serve(async (req) => {
   } catch {
     return json({ error: 'Invalid JSON body' }, 400)
   }
-  const { quiz_id, text, model } = input ?? {}
-  if (typeof text !== 'string' || !text.trim() || text.length > MAX_TEXT) {
-    return json({ error: `text is required (max ${MAX_TEXT} characters)` }, 400)
-  }
+  const { quiz_id, text, model, step } = input ?? {}
+  if (step !== 'extract' && step !== 'reasons') return json({ error: 'step must be "extract" or "reasons"' }, 400)
   if (model != null && !/^[A-Za-z0-9._-]+$/.test(model)) return json({ error: 'Invalid model' }, 400)
   if (quiz_id != null && !/^[0-9a-f-]{36}$/i.test(quiz_id)) return json({ error: 'Invalid quiz_id' }, 400)
 
+  let prompt: string
+  let questions: QuizQuestion[] | null = null
+  if (step === 'extract') {
+    if (typeof text !== 'string' || !text.trim() || text.length > MAX_TEXT) {
+      return json({ error: `text is required (max ${MAX_TEXT} characters)` }, 400)
+    }
+    prompt = buildExtractPrompt(text, TOPICS)
+  } else {
+    questions = parseQuestions(input.questions)
+    if (!questions) return json({ error: 'questions with position, text, options and correct_label are required' }, 400)
+    prompt = buildReasonsPrompt(questions, TOPICS)
+  }
+
   const quizId: string | null = quiz_id ?? null
   const primary: string = model ?? Deno.env.get('MODEL') ?? DEFAULT_MODEL
-  const prompt = buildPrompt(text, TOPICS)
 
   let used = primary
-  let result = await callModel(primary, prompt, quizId)
+  let { result, logId } = await callModel(primary, prompt, step, quizId)
   if (!result.ok && RETRY_STATUS.includes(result.status)) {
     await sleep(2000)
-    result = await callModel(primary, prompt, quizId)
+    ;({ result, logId } = await callModel(primary, prompt, step, quizId))
     for (const fallback of FALLBACK_MODELS.filter((m) => m !== primary)) {
       if (result.ok) break
       used = fallback
-      result = await callModel(fallback, prompt, quizId)
+      ;({ result, logId } = await callModel(fallback, prompt, step, quizId))
     }
   }
   if (!result.ok) return json({ error: result.error }, 502)
 
-  const questions = cleanQuestions(result.data)
-  if (!questions) return json({ error: 'Model returned an unexpected shape' }, 502)
-  return json({ questions, topics: TOPICS, model: used, prompt_version: PROMPT_VERSION })
+  if (step === 'extract') {
+    return json({ step, questions: cleanExtracted(result.data), topics: TOPICS, model: used, prompt_version: PROMPT_VERSION })
+  }
+
+  const cleaned = cleanReasons(result.data, questions!)
+  await db
+    .from('ai_calls')
+    .update({
+      details: {
+        step,
+        prompt_version: PROMPT_VERSION,
+        unknown: cleaned.unknown,
+        correct_option_reasons_dropped: cleaned.droppedCorrect,
+      },
+    })
+    .eq('id', logId)
+  return json({
+    step,
+    questions: cleaned.questions,
+    unknown_reasons: cleaned.unknown,
+    model: used,
+    prompt_version: PROMPT_VERSION,
+  })
 })
