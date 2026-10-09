@@ -1,0 +1,11 @@
+qid,text_exact,options_exact_of_5,ai_topic,stored_topic,topic_match,first_text_difference
+MIQ_2025-09-03_Q1,false,5,K03,K03,true,"at 7: ai ""——> X2(q) + 2Y2(q) reaksiyasında 1,2 mol"" vs json "" → X2(q) + 2Y2(q) reaksiyasında 1,2 mol """
+MIQ_2025-09-03_Q2,false,5,K13,K13,true,"at 3: ai ""⁰C-də 0,05 mol HCl olan 500 ml məhlulun "" vs json ""°C-də 0,05 mol HCl olan 500 ml məhlulun """
+MIQ_2025-09-03_Q3,false,5,K12,K12,true,"at 118: ai ""⁻ ionun qatılığını müəyyən edin."" vs json ""- ionun qatılığını müəyyən edin."""
+MIQ_2025-09-03_Q4,true,5,K06,K09,false,
+MIQ_2025-09-03_Q5,true,5,K03,K03,true,
+MIQ_2024-10-03_Q1,false,5,K03,K03,true,"at 231: ai "" A) 0,2 B) 0,3 C) 0,1 D) 1,2 E) 0,5"" vs json """""
+MIQ_2024-10-03_Q2,false,5,K09,K09,true,"at 32: ai ""a. Cr⁶⁺→ Cr³⁺ 2. ΔH>0 b. sublimasiya c. "" vs json ""2. ΔH>0 a. Cr6+ → Cr3+ b. sublimasiya c."""
+MIQ_2024-10-03_Q3,false,5,K03,K02,false,"at 10: ai ""| Qarışığın | Qarışığın tərkibi | mol sa"" vs json ""tərkibi | Qarışığın mol sayı | Qarışığın"""
+MIQ_2024-10-03_Q4,false,5,K07,K07,true,"at 20: ai ""³- hibrid orbitalları rabitənin əmələ gə"" vs json ""3- hibrid orbitalları rabitənin əmələ gə"""
+MIQ_2024-10-03_Q5,false,5,K07,K07,true,"at 98: ai ""₃ 2. CH₄ 3. H₂O 4. CH≡CH A) 1, 4 B) 2, 4"" vs json ""3 2. CH4 3. H2O 4. CH≡CH"""

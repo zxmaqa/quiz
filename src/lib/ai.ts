@@ -13,8 +13,12 @@ async function call(body: Record<string, unknown>): Promise<any> {
 }
 
 // Call 1: questions, options and topics only. Only the quiz text is sent, never student data.
-export async function extract(text: string, groupId?: string): Promise<{ questions: Extracted[]; topics: string[] }> {
-  return call({ step: 'extract', text, group_id: groupId })
+export async function extract(
+  text: string,
+  groupId?: string,
+  images?: string[], // JPEG base64, already resized in the browser
+): Promise<{ questions: Extracted[]; topics: string[] }> {
+  return call({ step: 'extract', text, group_id: groupId, images })
 }
 
 // Call 2: reasons for the wrong options. Receives the correct label of every question and

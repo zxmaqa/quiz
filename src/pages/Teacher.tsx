@@ -27,6 +27,7 @@ export default function Teacher() {
   const [groupName, setGroupName] = useState('')
   const [failed, setFailed] = useState(false)
   const [creating, setCreating] = useState(false)
+  const [photoMode, setPhotoMode] = useState(false)
   const [busyId, setBusyId] = useState('')
   const [copiedId, setCopiedId] = useState('')
   const [notes, setNotes] = useState<Record<string, string>>({})
@@ -123,6 +124,7 @@ export default function Teacher() {
         <>
           <NewQuiz
             groupId={groupId}
+            photo={photoMode}
             onSaved={() => {
               setCreating(false)
               refresh()
@@ -133,9 +135,26 @@ export default function Teacher() {
           </button>
         </>
       ) : (
-        <button onClick={() => setCreating(true)} className="btn btn-primary w-full sm:w-auto">
-          Yeni quiz
-        </button>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <button
+            onClick={() => {
+              setPhotoMode(false)
+              setCreating(true)
+            }}
+            className="btn btn-primary"
+          >
+            Yeni quiz
+          </button>
+          <button
+            onClick={() => {
+              setPhotoMode(true)
+              setCreating(true)
+            }}
+            className="btn btn-secondary"
+          >
+            Şəkildən quiz
+          </button>
+        </div>
       )}
       {failed && (
         <p role="alert" className="rounded-input bg-warn-bg p-3 text-warn">

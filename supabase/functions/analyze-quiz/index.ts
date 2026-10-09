@@ -64,6 +64,7 @@ async function callModel(
   kind: string,
   quizId: string | null,
   shapeKey = 'questions',
+  images?: string[],
 ): Promise<{ result: CallResult; logId: string }> {
   const started = Date.now()
   const logId = crypto.randomUUID()
@@ -83,7 +84,17 @@ async function callModel(
           model,
           max_tokens: 8192,
           temperature: 0,
-          messages: [{ role: 'user', content: prompt }],
+          messages: [
+            {
+              role: 'user',
+              content: images?.length
+                ? [
+                    ...images.map((data) => ({ type: 'image', source: { type: 'base64', media_type: 'image/jpeg', data } })),
+                    { type: 'text', text: prompt },
+                  ]
+                : prompt,
+            },
+          ],
         }),
       })
       const body = await res.json().catch(() => null)
@@ -101,7 +112,12 @@ async function callModel(
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-goog-api-key': Deno.env.get('GEMINI_API_KEY')! },
         body: JSON.stringify({
-          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          contents: [
+            {
+              role: 'user',
+              parts: [...(images ?? []).map((data) => ({ inlineData: { mimeType: 'image/jpeg', data } })), { text: prompt }],
+            },
+          ],
           generationConfig: { responseMimeType: 'application/json', temperature: 0 },
         }),
       })
@@ -623,6 +639,22 @@ Deno.serve(async (req) => {
     return json({ error: 'Invalid JSON body' }, 400)
   }
   const { quiz_id, group_id, text, model, step } = input ?? {}
+  // extract can read the quiz from photos: up to 6 JPEGs (base64), already resized in the browser
+  const rawImages: unknown = input?.images
+  let images: string[] | undefined
+  if (rawImages != null) {
+    if (
+      step !== 'extract' ||
+      !Array.isArray(rawImages) ||
+      rawImages.length === 0 ||
+      rawImages.length > 6 ||
+      rawImages.some((x) => typeof x !== 'string' || !/^[A-Za-z0-9+/=]+$/.test(x) || x.length > 3_000_000) ||
+      rawImages.reduce((n: number, x: string) => n + x.length, 0) > 9_000_000
+    ) {
+      return json({ error: 'images must be 1-6 base64 JPEGs (max 3 MB each) and only for step "extract"' }, 400)
+    }
+    images = rawImages as string[]
+  }
   if (step === 'solve' || step === 'class-summary') {
     if (model != null && !/^[A-Za-z0-9._-]+$/.test(model)) return json({ error: 'Invalid model' }, 400)
     if (quiz_id != null && !/^[0-9a-f-]{36}$/i.test(quiz_id)) return json({ error: 'Invalid quiz_id' }, 400)
@@ -649,10 +681,13 @@ Deno.serve(async (req) => {
   let prompt: string
   let questions: QuizQuestion[] | null = null
   if (step === 'extract') {
-    if (typeof text !== 'string' || !text.trim() || text.length > MAX_TEXT) {
+    if (!images && (typeof text !== 'string' || !text.trim() || text.length > MAX_TEXT)) {
       return json({ error: `text is required (max ${MAX_TEXT} characters)` }, 400)
     }
-    prompt = chemistry ? buildKimyaExtractPrompt(text) : buildExtractPrompt(text, TOPICS)
+    const quizText = images
+      ? 'The quiz is in the attached image(s). Read every question and all its options from the image(s), in reading order.'
+      : text
+    prompt = chemistry ? buildKimyaExtractPrompt(quizText) : buildExtractPrompt(quizText, TOPICS)
   } else {
     questions = parseQuestions(input.questions)
     if (!questions) return json({ error: 'questions with position, text, options and correct_label are required' }, 400)
@@ -660,17 +695,17 @@ Deno.serve(async (req) => {
   }
 
   const quizId: string | null = quiz_id ?? null
-  const primary: string = model ?? Deno.env.get('MODEL') ?? DEFAULT_MODEL
+  const primary: string = model ?? (images ? SOLVE_MODEL : (Deno.env.get('MODEL') ?? DEFAULT_MODEL))
 
   let used = primary
-  let { result, logId } = await callModel(primary, prompt, step, quizId)
+  let { result, logId } = await callModel(primary, prompt, step, quizId, 'questions', images)
   if (!result.ok && RETRY_STATUS.includes(result.status)) {
     await sleep(2000)
-    ;({ result, logId } = await callModel(primary, prompt, step, quizId))
+    ;({ result, logId } = await callModel(primary, prompt, step, quizId, 'questions', images))
     for (const fallback of FALLBACK_MODELS.filter((m) => m !== primary)) {
       if (result.ok) break
       used = fallback
-      ;({ result, logId } = await callModel(fallback, prompt, step, quizId))
+      ;({ result, logId } = await callModel(fallback, prompt, step, quizId, 'questions', images))
     }
   }
   if (!result.ok) return json({ error: result.error }, 502)

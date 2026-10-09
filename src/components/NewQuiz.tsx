@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { toJpegBase64 } from '../lib/image'
 import { extract, solveAndStore, withoutCorrect, writeReasons, type Extracted } from '../lib/ai'
 import { supabase } from '../lib/supabase'
 import { UNSURE, type Misconception } from '../lib/scoring'
@@ -6,7 +7,16 @@ import { topicLabel } from '../lib/topicNames'
 
 type Draft = Extracted & { correct: string | null; misconceptions: Record<string, Misconception> | null }
 
-export default function NewQuiz({ groupId, onSaved }: { groupId: string; onSaved: () => void }) {
+export default function NewQuiz({
+  groupId,
+  onSaved,
+  photo = false,
+}: {
+  groupId: string
+  onSaved: () => void
+  photo?: boolean
+}) {
+  const [files, setFiles] = useState<File[]>([])
   const [title, setTitle] = useState('')
   const [text, setText] = useState('')
   const [topics, setTopics] = useState<string[]>([])
@@ -18,7 +28,20 @@ export default function NewQuiz({ groupId, onSaved }: { groupId: string; onSaved
     setBusy(true)
     setError('')
     try {
-      const res = await extract(text, groupId)
+      let res
+      if (photo) {
+        let images: string[]
+        try {
+          images = await Promise.all(files.map(toJpegBase64))
+        } catch {
+          setError('Şəkil oxunmadı. JPEG və ya PNG şəkil seçin.')
+          setBusy(false)
+          return
+        }
+        res = await extract('', groupId, images)
+      } else {
+        res = await extract(text, groupId)
+      }
       if (res.questions.length === 0) {
         setError('Mətndə sual tapılmadı.')
       } else {
@@ -103,22 +126,31 @@ export default function NewQuiz({ groupId, onSaved }: { groupId: string; onSaved
             className="input"
           />
         </label>
-        <label className="block space-y-1">
-          <span className="font-semibold">Quiz mətni</span>
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            rows={10}
-            className="input"
-          />
-        </label>
+        {photo ? (
+          <label className="block space-y-1">
+            <span className="font-semibold">Quiz şəkilləri</span>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(e) => setFiles(Array.from(e.target.files ?? []).slice(0, 6))}
+              className="input py-3"
+            />
+            {files.length > 0 && <span className="text-sm text-muted">{files.length} şəkil seçildi</span>}
+          </label>
+        ) : (
+          <label className="block space-y-1">
+            <span className="font-semibold">Quiz mətni</span>
+            <textarea value={text} onChange={(e) => setText(e.target.value)} rows={10} className="input" />
+          </label>
+        )}
         {error && (
         <p role="alert" className="rounded-input bg-warn-bg p-3 text-warn">
           {error}
         </p>
       )}
         <button
-          disabled={busy || !title.trim() || !text.trim()}
+          disabled={busy || !title.trim() || (photo ? files.length === 0 : !text.trim())}
           onClick={read}
           className="btn btn-primary w-full"
         >
