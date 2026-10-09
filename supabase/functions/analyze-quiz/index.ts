@@ -261,19 +261,41 @@ function checkCalculation(calculation: unknown, questionText: string, optionText
 
 // ---- cleaning ---------------------------------------------------------------------------------
 
+// ---- answer options must not stay inside the question text ------------------------------------------
+
+const escapeRe = (v: string) => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+const valueRe = (v: string) => escapeRe(v.trim()).replace(/\s+/g, '\\s+')
+const markerRe = (label: string) => `\\(?${label}[).]`
+
+// Removes the option list ("A) .. B) .. E) ..", same values as the extracted options) wherever it appears in the
+// question text, and every line that holds only one option. The options themselves are never touched.
+function stripOptions(text: string, options: { label: string; text: string }[]): string {
+  const opts = options.filter((o) => /^[A-Z]$/.test(o.label) && o.text.trim())
+  if (opts.length < 2) return text
+  const list = opts.map((o) => `${markerRe(o.label)}\\s*${valueRe(o.text)}`).join('\\s+')
+  const withoutList = text.replace(new RegExp(list, 'g'), ' ')
+  const lines = withoutList
+    .split('\n')
+    .filter((line) => !opts.some((o) => new RegExp(`^\\s*${markerRe(o.label)}\\s*${valueRe(o.text)}\\s*$`).test(line)))
+  return lines.join('\n').trim()
+}
+
 // deno-lint-ignore no-explicit-any
 function cleanExtracted(data: any) {
   // deno-lint-ignore no-explicit-any
-  return data.questions.map((q: any, i: number) => ({
-    position: Number.isInteger(q?.position) ? q.position : i + 1,
-    text: String(q?.text ?? ''),
+  return data.questions.map((q: any, i: number) => {
     // deno-lint-ignore no-explicit-any
-    options: (Array.isArray(q?.options) ? q.options : []).map((o: any) => ({
+    const options = (Array.isArray(q?.options) ? q.options : []).map((o: any) => ({
       label: String(o?.label ?? '').toUpperCase(),
       text: String(o?.text ?? ''),
-    })),
-    topic: TOPICS.includes(q?.topic) ? q.topic : 'UNSURE',
-  }))
+    }))
+    return {
+      position: Number.isInteger(q?.position) ? q.position : i + 1,
+      text: stripOptions(String(q?.text ?? ''), options),
+      options,
+      topic: TOPICS.includes(q?.topic) ? q.topic : 'UNSURE',
+    }
+  })
 }
 
 type Misconception = { reason: string; calculation?: string; confidence?: string; unchecked?: boolean }
@@ -335,16 +357,12 @@ function cleanExtractedKimya(data: any) {
     const returned = typeof q?.topic === 'string' ? q.topic.trim() : ''
     const topic = KIMYA_IDS.includes(returned.toUpperCase()) ? returned.toUpperCase() : 'UNSURE'
     if (topic === 'UNSURE' && returned.toUpperCase() !== 'UNSURE') invalidTopics.push({ position, returned })
-    return {
-      position,
-      text: String(q?.text ?? ''),
-      // deno-lint-ignore no-explicit-any
-      options: (Array.isArray(q?.options) ? q.options : []).map((o: any) => ({
-        label: String(o?.label ?? '').toUpperCase(),
-        text: String(o?.text ?? ''),
-      })),
-      topic,
-    }
+    // deno-lint-ignore no-explicit-any
+    const options = (Array.isArray(q?.options) ? q.options : []).map((o: any) => ({
+      label: String(o?.label ?? '').toUpperCase(),
+      text: String(o?.text ?? ''),
+    }))
+    return { position, text: stripOptions(String(q?.text ?? ''), options), options, topic }
   })
   return { questions, invalidTopics }
 }
@@ -685,7 +703,7 @@ Deno.serve(async (req) => {
       return json({ error: `text is required (max ${MAX_TEXT} characters)` }, 400)
     }
     const quizText = images
-      ? 'The quiz is in the attached image(s). Read every question and all its options from the image(s), in reading order.'
+      ? 'The quiz is in the attached image(s). Read every question and all its options from the image(s), in reading order. The question text must not include the answer options.'
       : text
     prompt = chemistry ? buildKimyaExtractPrompt(quizText) : buildExtractPrompt(quizText, TOPICS)
   } else {
