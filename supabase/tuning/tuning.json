@@ -1,0 +1,90 @@
+{
+  "_note": "Prompt-tuning set only. Not loaded into any database. 'intended' is ground truth for judging the model's reasons; it is never sent to the model.",
+  "questions": [
+    {
+      "position": 1,
+      "topic": "Faiz",
+      "text": "Qiyməti 200 manat olan mala əvvəlcə 10%, sonra daha 20% endirim edilib. Son qiymət neçə manatdır?",
+      "options": [
+        { "label": "A", "text": "140" },
+        { "label": "B", "text": "144" },
+        { "label": "C", "text": "180" },
+        { "label": "D", "text": "20" }
+      ],
+      "correct_label": "B",
+      "intended": {
+        "A": { "mistake": "adds percentages instead of applying them in sequence", "calculation": "200 - 200*(10+20)/100 = 140" },
+        "C": { "mistake": "applies only the first step", "calculation": "200 - 200*10/100 = 180" },
+        "D": { "mistake": "gives the discount amount instead of the new price", "calculation": "200*10/100 = 20" }
+      }
+    },
+    {
+      "position": 2,
+      "topic": "Faiz",
+      "text": "Sinifdə 40 şagird var. Onların 25%-i futbol oynayır. Neçə şagird futbol oynayır?",
+      "options": [
+        { "label": "A", "text": "1.6" },
+        { "label": "B", "text": "15" },
+        { "label": "C", "text": "10" },
+        { "label": "D", "text": "1000" }
+      ],
+      "correct_label": "C",
+      "intended": {
+        "A": { "mistake": "divides by the percent instead of multiplying", "calculation": "40 / 25 = 1.6" },
+        "B": { "mistake": null, "calculation": "40 - 25 = 15 (no catalog item; unknown expected)" },
+        "D": { "mistake": "forgot to divide by 100 (not in catalog)", "calculation": "40 * 25 = 1000" }
+      }
+    },
+    {
+      "position": 3,
+      "topic": "Kəsrlər",
+      "text": "1/2 + 1/3 məbləği neçədir?",
+      "options": [
+        { "label": "A", "text": "2/5" },
+        { "label": "B", "text": "1/6" },
+        { "label": "C", "text": "3/5" },
+        { "label": "D", "text": "5/6" }
+      ],
+      "correct_label": "D",
+      "intended": {
+        "A": { "mistake": "adds numerators and denominators separately", "calculation": "(1+1)/(2+3) = 2/5" },
+        "B": { "mistake": "multiplies instead of adding (not in catalog)", "calculation": "1/2 * 1/3 = 1/6" },
+        "C": { "mistake": null, "calculation": "no mistake reproduces it; unknown expected" }
+      }
+    },
+    {
+      "position": 4,
+      "topic": "Tənliklər",
+      "text": "5x − 3 = 12 tənliyində x neçədir?",
+      "options": [
+        { "label": "A", "text": "3" },
+        { "label": "B", "text": "9/5" },
+        { "label": "C", "text": "15" },
+        { "label": "D", "text": "12/5" }
+      ],
+      "correct_label": "A",
+      "intended": {
+        "B": { "mistake": "moves a term without changing its sign", "calculation": "(12-3)/5 = 9/5" },
+        "C": { "mistake": "forgets to divide by 5 (not in catalog)", "calculation": "12+3 = 15" },
+        "D": { "mistake": "ignores the -3 (not in catalog)", "calculation": "12/5 = 12/5" }
+      }
+    },
+    {
+      "position": 5,
+      "topic": "Nisbət və tənasüb",
+      "text": "Qarışıqda qırmızı və mavi boya 2:3 nisbətindədir. 6 litr qırmızı boya üçün neçə litr mavi boya lazımdır?",
+      "options": [
+        { "label": "A", "text": "4" },
+        { "label": "B", "text": "7" },
+        { "label": "C", "text": "9" },
+        { "label": "D", "text": "5" }
+      ],
+      "correct_label": "C",
+      "intended": {
+        "A": { "mistake": "inverts the ratio", "calculation": "6*2/3 = 4" },
+        "B": { "mistake": "adds instead of scaling", "calculation": "6+(3-2) = 7" },
+        "D": { "mistake": null, "calculation": "2+3 = 5 is the total number of parts, not a typical mistake here; unknown expected" }
+      }
+    }
+  ]
+}
