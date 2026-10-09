@@ -32,7 +32,7 @@ export default function MissedItem({
           <p className="font-semibold">Düzgün həll</p>
           <ol className="mono list-decimal space-y-1 pl-6 text-sm">
             {q.solution.map((step, i) => (
-              <li key={i}>{step}</li>
+              <li key={i}>{step.replaceAll('*', '×')}</li>
             ))}
           </ol>
         </div>

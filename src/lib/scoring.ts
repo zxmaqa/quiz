@@ -101,6 +101,7 @@ export function analyzeStudent(questions: Question[], answers: Answers) {
 export type TopicRow = {
   topic: string
   questions: number
+  positions: number[] // question numbers in this topic
   cells: { name: string; accuracy: number; weak: boolean }[]
   weakCount: number
   avgAccuracy: number
@@ -123,6 +124,7 @@ export function classMap(questions: Question[], students: { student_name: string
     return {
       topic,
       questions: inTopic.length,
+      positions: inTopic.map((q) => q.position),
       cells,
       weakCount: cells.filter((c) => c.weak).length,
       avgAccuracy: Math.round(avg),

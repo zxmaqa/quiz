@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { classMap, type Answers, type Question } from '../lib/scoring'
-import { topicLabel } from '../lib/topicNames'
+import { topicLabel, topicName } from '../lib/topicNames'
 
 type Summary = { focus_topics: { topic: string; students_weak: number; why: string }[]; next_lesson_plan: string[] }
 
@@ -27,7 +27,8 @@ export default function ClassMap({
     setFailed(false)
     // Only per-topic numbers are sent: never student names or answers.
     const stats = rows.map((r) => ({
-      topic: topicLabel(r.topic),
+      topic: topicName(r.topic),
+      question_numbers: r.positions,
       questions: r.questions,
       students: students.length,
       weak_students: r.weakCount,
@@ -85,19 +86,30 @@ export default function ClassMap({
             {rows.map((r) => (
               <tr key={r.topic} className="border-b border-line">
                 <td className="sticky left-0 min-w-40 bg-card p-2 text-left font-semibold">{topicLabel(r.topic)}</td>
-                <td className="mono whitespace-nowrap p-2">
-                  {r.weakCount} / {students.length}
-                </td>
-                {r.cells.map((c, i) => (
-                  <td key={i} className={`mono p-2 ${c.weak ? 'bg-warn-bg text-warn' : ''}`}>
-                    {c.accuracy}%
+                {r.questions < 2 ? (
+                  <td className="whitespace-nowrap p-2 text-muted">1 sual — az</td>
+                ) : (
+                  <td className="mono whitespace-nowrap p-2">
+                    {r.weakCount} / {students.length}
                   </td>
-                ))}
+                )}
+                {r.cells.map((c, i) =>
+                  r.questions < 2 ? (
+                    <td key={i} className={`p-2 font-bold ${c.accuracy === 100 ? 'text-ok' : 'text-warn'}`}>
+                      {c.accuracy === 100 ? '✓' : '✗'}
+                    </td>
+                  ) : (
+                    <td key={i} className={`mono p-2 ${c.weak ? 'bg-warn-bg text-warn' : ''}`}>
+                      {c.accuracy}%
+                    </td>
+                  ),
+                )}
               </tr>
             ))}
           </tbody>
         </table>
       </div>
+      <p className="px-5 text-sm text-muted">Zəif mövzu: ən azı 2 sual və 60%-dən aşağı nəticə.</p>
 
       <div className="space-y-3 border-t border-line bg-primary-soft p-5">
         <div className="flex items-center justify-between gap-3">

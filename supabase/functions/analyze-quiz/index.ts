@@ -539,8 +539,12 @@ function parseStats(raw: any): TopicStat[] | null {
     if (typeof t?.topic !== 'string' || !t.topic.trim() || t.topic.length > 120) return null
     const nums = [t.questions, t.students, t.weak_students, t.avg_accuracy]
     if (nums.some((n) => !Number.isFinite(n) || n < 0 || n > 100000)) return null
+    if (!Array.isArray(t.question_numbers) || t.question_numbers.length > 100 || t.question_numbers.some((n: unknown) => !Number.isInteger(n))) {
+      return null
+    }
     out.push({
       topic: t.topic,
+      question_numbers: t.question_numbers,
       questions: t.questions,
       students: t.students,
       weak_students: t.weak_students,
@@ -561,22 +565,31 @@ async function handleClassSummary(input: { stats?: unknown; quiz_id?: string; mo
 
   // Only numbers from the input may appear in the text; students_weak always comes from the input.
   const allowedNumbers = new Set(
-    stats.flatMap((t) => [t.questions, t.students, t.weak_students, t.avg_accuracy].map(String)),
+    stats.flatMap((t) => [...t.question_numbers, t.questions, t.students, t.weak_students, t.avg_accuracy].map(String)),
   )
   // topic labels (for example "K07") contain digits that are not statistics, so they are removed first
   const withoutTopics = (text: string) =>
     stats.reduce((t, s) => t.split(s.topic).join(' '), text).replace(/Kd{2}/g, ' ')
   const onlyInputNumbers = (text: string) => numbers(withoutTopics(text)).every((n) => allowedNumbers.has(n))
+  // topic names only: a code such as K07 anywhere in the text rejects it
+  const hasTopicCode = (text: string) => /Kd{2}/.test(text)
+  // a concrete plan item names a focus topic and at least one of that topic's question numbers
+  const isConcrete = (text: string) => {
+    const stat = stats.find((t) => text.toLowerCase().includes(t.topic.toLowerCase()))
+    if (!stat) return false
+    const used = numbers(withoutTopics(text))
+    return stat.question_numbers.some((n) => used.includes(String(n)))
+  }
   const focus = (Array.isArray(data.focus_topics) ? data.focus_topics : [])
     // deno-lint-ignore no-explicit-any
     .map((f: any) => ({ f, stat: stats.find((t) => t.topic === f?.topic) }))
     // deno-lint-ignore no-explicit-any
-    .filter(({ f, stat }: any) => stat && stat.weak_students > 0 && typeof f?.why === 'string' && onlyInputNumbers(f.why))
+    .filter(({ f, stat }: any) => stat && stat.weak_students > 0 && typeof f?.why === 'string' && onlyInputNumbers(f.why) && !hasTopicCode(f.why))
     // deno-lint-ignore no-explicit-any
     .map(({ f, stat }: any) => ({ topic: stat.topic, students_weak: stat.weak_students, why: f.why.trim() }))
     .slice(0, 3)
   const plan = (Array.isArray(data.next_lesson_plan) ? data.next_lesson_plan : [])
-    .filter((x: unknown) => typeof x === 'string' && x.trim() && onlyInputNumbers(x))
+    .filter((x: unknown) => typeof x === 'string' && x.trim() && onlyInputNumbers(x) && !hasTopicCode(x) && isConcrete(x))
     .map((x: string) => x.trim())
     .slice(0, 4)
   const summary = { focus_topics: focus, next_lesson_plan: plan }
