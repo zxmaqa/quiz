@@ -2,9 +2,9 @@ import { createClient } from 'npm:@supabase/supabase-js@2'
 import { buildPrompt, PROMPT_VERSION } from './prompt.ts'
 import { TOPICS } from './topics.ts'
 
-const DEFAULT_MODEL = 'gemini-3.8-flash'
-const FALLBACK_MODEL = 'gemini-3.5-flash-lite'
-const RETRY_STATUS = [429, 500, 503]
+const DEFAULT_MODEL = 'claude-haiku-4-5'
+const FALLBACK_MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash-lite']
+const RETRY_STATUS = [429, 500, 503, 529]
 const MAX_TEXT = 20000
 
 const cors = {
@@ -21,36 +21,79 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
 
 type CallResult = { ok: true; data: unknown } | { ok: false; status: number; error: string }
 
-// One Gemini call. Every call (success or failure) is logged to ai_calls.
-async function callGemini(model: string, prompt: string, quizId: string | null): Promise<CallResult> {
+// Claude may wrap JSON in a code fence or add a sentence around it.
+const extractJson = (raw: string) => {
+  const from = raw.indexOf('{')
+  const to = raw.lastIndexOf('}')
+  const fromArr = raw.indexOf('[')
+  const toArr = raw.lastIndexOf(']')
+  return from !== -1 && (fromArr === -1 || from < fromArr) ? raw.slice(from, to + 1) : raw.slice(fromArr, toArr + 1)
+}
+
+function parseModelJson(raw: string): CallResult {
+  try {
+    const parsed = JSON.parse(extractJson(raw))
+    const data = Array.isArray(parsed) ? { questions: parsed } : parsed
+    return Array.isArray(data?.questions)
+      ? { ok: true, data }
+      : { ok: false, status: 502, error: `Unexpected shape: ${raw.slice(0, 300)}` }
+  } catch {
+    return { ok: false, status: 502, error: `Invalid JSON: ${raw.slice(0, 300)}` }
+  }
+}
+
+// One model call (Claude or Gemini, chosen by model name). Every call is logged to ai_calls.
+async function callModel(model: string, prompt: string, quizId: string | null): Promise<CallResult> {
   const started = Date.now()
   let result: CallResult
-  // deno-lint-ignore no-explicit-any
-  let usage: any = {}
+  let inputTokens: number | null = null
+  let outputTokens: number | null = null
   try {
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'x-goog-api-key': Deno.env.get('GEMINI_API_KEY')! },
-      body: JSON.stringify({
-        contents: [{ role: 'user', parts: [{ text: prompt }] }],
-        generationConfig: { responseMimeType: 'application/json', temperature: 0 },
-      }),
-    })
-    const body = await res.json().catch(() => null)
-    usage = body?.usageMetadata ?? {}
-    if (!res.ok) {
-      result = { ok: false, status: res.status, error: body?.error?.message ?? `HTTP ${res.status}` }
+    if (model.startsWith('claude-')) {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': Deno.env.get('ANTHROPIC_API_KEY')!,
+          'anthropic-version': '2023-06-01',
+        },
+        body: JSON.stringify({
+          model,
+          max_tokens: 8192,
+          temperature: 0,
+          messages: [{ role: 'user', content: prompt }],
+        }),
+      })
+      const body = await res.json().catch(() => null)
+      inputTokens = body?.usage?.input_tokens ?? null
+      outputTokens = body?.usage?.output_tokens ?? null
+      if (!res.ok) {
+        result = { ok: false, status: res.status, error: body?.error?.message ?? `HTTP ${res.status}` }
+      } else {
+        // deno-lint-ignore no-explicit-any
+        const raw = (body?.content ?? []).map((c: any) => c.text ?? '').join('')
+        result = parseModelJson(raw)
+      }
     } else {
-      // deno-lint-ignore no-explicit-any
-      const raw = (body?.candidates?.[0]?.content?.parts ?? []).map((p: any) => p.text ?? '').join('')
-      try {
-        const parsed = JSON.parse(raw)
-        const data = Array.isArray(parsed) ? { questions: parsed } : parsed
-        result = Array.isArray(data?.questions)
-          ? { ok: true, data }
-          : { ok: false, status: 502, error: `Unexpected shape: ${raw.slice(0, 300)}` }
-      } catch {
-        result = { ok: false, status: 502, error: `Invalid JSON: ${raw.slice(0, 300)}` }
+      const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': Deno.env.get('GEMINI_API_KEY')! },
+        body: JSON.stringify({
+          contents: [{ role: 'user', parts: [{ text: prompt }] }],
+          generationConfig: { responseMimeType: 'application/json', temperature: 0 },
+        }),
+      })
+      const body = await res.json().catch(() => null)
+      const usage = body?.usageMetadata ?? {}
+      inputTokens = usage.promptTokenCount ?? null
+      // thinking tokens are billed as output
+      outputTokens = (usage.candidatesTokenCount ?? 0) + (usage.thoughtsTokenCount ?? 0) || null
+      if (!res.ok) {
+        result = { ok: false, status: res.status, error: body?.error?.message ?? `HTTP ${res.status}` }
+      } else {
+        // deno-lint-ignore no-explicit-any
+        const raw = (body?.candidates?.[0]?.content?.parts ?? []).map((p: any) => p.text ?? '').join('')
+        result = parseModelJson(raw)
       }
     }
   } catch (e) {
@@ -60,9 +103,8 @@ async function callGemini(model: string, prompt: string, quizId: string | null):
     quiz_id: quizId,
     kind: 'analyze-quiz',
     model,
-    input_tokens: usage.promptTokenCount ?? null,
-    // thinking tokens are billed as output
-    output_tokens: (usage.candidatesTokenCount ?? 0) + (usage.thoughtsTokenCount ?? 0) || null,
+    input_tokens: inputTokens,
+    output_tokens: outputTokens,
     ms: Date.now() - started,
     ok: result.ok,
     error: result.ok ? null : result.error.slice(0, 500),
@@ -155,13 +197,14 @@ Deno.serve(async (req) => {
   const prompt = buildPrompt(text, TOPICS)
 
   let used = primary
-  let result = await callGemini(primary, prompt, quizId)
+  let result = await callModel(primary, prompt, quizId)
   if (!result.ok && RETRY_STATUS.includes(result.status)) {
     await sleep(2000)
-    result = await callGemini(primary, prompt, quizId)
-    if (!result.ok) {
-      used = FALLBACK_MODEL
-      result = await callGemini(FALLBACK_MODEL, prompt, quizId)
+    result = await callModel(primary, prompt, quizId)
+    for (const fallback of FALLBACK_MODELS.filter((m) => m !== primary)) {
+      if (result.ok) break
+      used = fallback
+      result = await callModel(fallback, prompt, quizId)
     }
   }
   if (!result.ok) return json({ error: result.error }, 502)
