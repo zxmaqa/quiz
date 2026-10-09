@@ -2,7 +2,7 @@ import { ATOMIC_MASSES, SOLUTION_CONSTANTS } from './atomic_masses.ts'
 import type { QuizQuestion } from './prompt.ts'
 
 // "solve" and "class-summary" modes. The v5 (math) and v6 (chemistry) prompts are not touched.
-export const PROMPT_VERSION = 'solve-v1'
+export const PROMPT_VERSION = 'solve-v2'
 export const SUMMARY_PROMPT_VERSION = 'summary-v2'
 
 // Worked solutions for numeric questions (math or chemistry). The teacher's correct answer is given.
@@ -27,9 +27,10 @@ Schema:
 
 Rules:
 1. Each step is plain arithmetic written as "expression = value": only digits, decimal point or decimal comma, + - * / ( ) and "=". No letters, no variables, no words, no units, no % sign (write 20% as 20/100), no powers, roots or logarithms. Always write multiplication with *.
-2. An expression may use only these numbers: numbers written in the question (including the digits inside chemical formulas and the given Mr/Ar values), these standard atomic masses: ${masses}, the constants ${SOLUTION_CONSTANTS.join(', ')}, and the values of earlier steps.
-3. "final" is the value of the last step as a plain number. It must be exactly the value of the correct option.
-4. If you cannot solve the question with such steps, write "solution_steps": [] and "final": null. Never write steps that end at any other value.
+2. An expression may use only these numbers: numbers written in the question (including the digits inside chemical formulas, the coefficients of any chemical equation written in the question, and the given Mr/Ar values), these standard atomic masses: ${masses}, the constants ${SOLUTION_CONSTANTS.join(', ')}, and the values of earlier steps.
+3. Never type a number that is not in that list, and never type the result of mental arithmetic. If you need another number, build it inside the expression from allowed numbers: write 4*7, not 28. To convert units use the constant 1000: 500 ml is 500/1000 litres, never 0.5.
+4. "final" is the value of the last step as a plain number. It must be exactly the value of the correct option.
+5. If you cannot solve the question with such steps, write "solution_steps": [] and "final": null. Never write steps that end at any other value.
 
 <quiz>
 ${quiz}
