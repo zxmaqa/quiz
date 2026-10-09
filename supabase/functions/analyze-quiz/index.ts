@@ -58,7 +58,7 @@ function parseModelJson(raw: string, shapeKey = 'questions'): CallResult {
 }
 
 // One model call (Claude or Gemini, chosen by model name). Every call is logged to ai_calls.
-async function callModel(
+async function callModelOnce(
   model: string,
   prompt: string,
   kind: string,
@@ -149,6 +149,21 @@ async function callModel(
     error: result.ok ? null : result.error.slice(0, 500),
   })
   return { result, logId }
+}
+
+// A reply that is not valid JSON (or lacks the expected array) is retried once with the same model, in every mode.
+// callModelOnce logs each attempt to ai_calls, so both attempts are recorded.
+async function callModel(
+  model: string,
+  prompt: string,
+  kind: string,
+  quizId: string | null,
+  shapeKey = 'questions',
+  images?: string[],
+): Promise<{ result: CallResult; logId: string }> {
+  const first = await callModelOnce(model, prompt, kind, quizId, shapeKey, images)
+  const badJson = !first.result.ok && /^(Invalid JSON|Unexpected shape)/.test(first.result.error)
+  return badJson ? callModelOnce(model, prompt, kind, quizId, shapeKey, images) : first
 }
 
 // ---- exact arithmetic (no eval) -------------------------------------------------------------
