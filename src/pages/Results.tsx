@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { score, status, weakTopics, type Answers, type Question } from '../lib/scoring'
+import MissedItem from '../components/MissedItem'
+import { analyzeStudent, score, status, weakTopics, type Answers, type Question } from '../lib/scoring'
 
 type Submission = { id: string; student_name: string; answers: Answers }
 
@@ -43,9 +44,9 @@ export default function Results() {
     else setSubmissions((list) => list?.filter((s) => s.id !== id) ?? null)
   }
 
-  const wrongPercent = (q: Question) =>
+  const percent = (q: Question, kind: 'wrong' | 'blank') =>
     Math.round(
-      (100 * (submissions ?? []).filter((s) => status(q, s.answers) === 'wrong').length) /
+      (100 * (submissions ?? []).filter((s) => status(q, s.answers) === kind).length) /
         (submissions?.length || 1),
     )
 
@@ -79,7 +80,12 @@ export default function Results() {
               <tbody>
                 {submissions.map((s) => (
                   <tr key={s.id} className="border-b border-gray-200">
-                    <td className="p-2 text-left font-medium">{s.student_name}</td>
+                    <td className="p-2 text-left font-medium">
+                      {s.student_name}
+                      {analyzeStudent(questions, s.answers).timeRanOut && (
+                        <span className="block text-xs font-normal text-gray-500">vaxt çatmayıb</span>
+                      )}
+                    </td>
                     {questions.map((q) => {
                       const m = mark[status(q, s.answers)]
                       return (
@@ -105,7 +111,16 @@ export default function Results() {
                   <td className="p-2 text-left">Yanlış %</td>
                   {questions.map((q) => (
                     <td key={q.id} className="p-2">
-                      {wrongPercent(q)}%
+                      {percent(q, 'wrong')}%
+                    </td>
+                  ))}
+                  <td colSpan={3} />
+                </tr>
+                <tr className="font-semibold">
+                  <td className="p-2 text-left">Boş %</td>
+                  {questions.map((q) => (
+                    <td key={q.id} className="p-2">
+                      {percent(q, 'blank')}%
                     </td>
                   ))}
                   <td colSpan={3} />
@@ -113,6 +128,31 @@ export default function Results() {
               </tfoot>
             </table>
           </div>
+          <section className="space-y-2">
+            <h2 className="font-semibold">Ehtimal olunan səbəblər</h2>
+            {submissions.map((s) => {
+              const { missed, strong } = analyzeStudent(questions, s.answers)
+              if (missed.length === 0) return null
+              return (
+                <details key={s.id} className="rounded-xl border border-gray-300 p-3">
+                  <summary className="cursor-pointer font-medium">
+                    {s.student_name}
+                    {strong.length > 0 && <span className="ml-2 text-amber-700">güclü siqnal</span>}
+                  </summary>
+                  <div className="mt-2 space-y-2">
+                    {strong.map((x) => (
+                      <p key={x.reason} className="text-amber-700">
+                        Güclü siqnal: ehtimal eyni səhv {x.count} dəfə təkrarlanıb — {x.reason}
+                      </p>
+                    ))}
+                    {missed.map((m) => (
+                      <MissedItem key={m.q.id} item={m} answerLabel="Cavab" />
+                    ))}
+                  </div>
+                </details>
+              )
+            })}
+          </section>
           <ol className="space-y-1 text-sm text-gray-700">
             {questions.map((q) => (
               <li key={q.id}>

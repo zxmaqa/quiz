@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
-import { score, status, weakTopics, type Answers, type Question } from '../lib/scoring'
+import MissedItem from '../components/MissedItem'
+import { analyzeStudent, score, weakTopics, type Answers, type Question } from '../lib/scoring'
 
 type Quiz = { id: string; title: string; status: string }
 
@@ -176,10 +177,10 @@ export default function Student() {
   )
 }
 
+
 function Result({ quiz, questions, answers }: { quiz: Quiz; questions: Question[]; answers: Answers }) {
   const weak = weakTopics(questions, answers)
-  const missed = questions.filter((q) => status(q, answers) !== 'correct')
-  const textOf = (q: Question, label: string) => q.options.find((o) => o.label === label)?.text ?? ''
+  const { missed, strong } = analyzeStudent(questions, answers)
 
   return (
     <main className="mx-auto max-w-xl space-y-4 p-4">
@@ -191,27 +192,22 @@ function Result({ quiz, questions, answers }: { quiz: Quiz; questions: Question[
         <h2 className="font-semibold">Zəif mövzular</h2>
         <p>{weak.length ? weak.join(', ') : 'Zəif mövzu yoxdur.'}</p>
       </section>
+      {strong.length > 0 && (
+        <section>
+          <h2 className="font-semibold">Güclü siqnal</h2>
+          {strong.map((s) => (
+            <p key={s.reason}>
+              Ehtimal, eyni səhv {s.count} dəfə təkrarlanıb: {s.reason}
+            </p>
+          ))}
+        </section>
+      )}
       {missed.length > 0 && (
         <section className="space-y-3">
           <h2 className="font-semibold">Səhv cavablar</h2>
-          {missed.map((q) => {
-            const a = answers[q.id]
-            const reason = a ? q.misconceptions?.[a] : undefined
-            return (
-              <div key={q.id} className="space-y-1 rounded-xl border border-gray-300 p-3">
-                <p className="font-medium">
-                  {q.position}. {q.text}
-                </p>
-                <p className="text-red-700">
-                  {a ? `Sizin cavab: ${a}) ${textOf(q, a)}` : 'Boş buraxılıb'}
-                </p>
-                <p className="text-green-700">
-                  Düzgün cavab: {q.correct_label}) {textOf(q, q.correct_label)}
-                </p>
-                {reason && <p className="text-sm text-gray-700">{reason}</p>}
-              </div>
-            )
-          })}
+          {missed.map((m) => (
+            <MissedItem key={m.q.id} item={m} answerLabel="Sizin cavab" />
+          ))}
         </section>
       )}
     </main>
