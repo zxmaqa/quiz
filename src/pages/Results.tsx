@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import MissedItem from '../components/MissedItem'
+import { topicName } from '../lib/topicNames'
 import { analyzeStudent, score, status, weakTopics, type Answers, type Question } from '../lib/scoring'
 
 type Submission = { id: string; student_name: string; answers: Answers }
@@ -97,7 +98,7 @@ export default function Results() {
                     <td className="p-2 font-semibold">
                       {score(questions, s.answers)} / {questions.length}
                     </td>
-                    <td className="p-2 text-left">{weakTopics(questions, s.answers).join(', ') || '—'}</td>
+                    <td className="p-2 text-left">{weakTopics(questions, s.answers).map(topicName).join(', ') || '—'}</td>
                     <td className="p-2">
                       <button onClick={() => remove(s.id)} className="rounded-lg border border-red-600 px-3 py-1 text-red-700">
                         Sil
@@ -156,7 +157,7 @@ export default function Results() {
           <ol className="space-y-1 text-sm text-gray-700">
             {questions.map((q) => (
               <li key={q.id}>
-                {q.position}. {q.text} <span className="text-gray-500">({q.topic})</span>
+                {q.position}. {q.text} <span className="text-gray-500">({topicName(q.topic)})</span>
               </li>
             ))}
           </ol>

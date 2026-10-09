@@ -29,3 +29,6 @@ dist-ssr
 !.env.example
 .vercel
 supabase/.temp
+
+# Original quiz images (not for the repo)
+eval/source_images/

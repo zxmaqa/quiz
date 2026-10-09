@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { extract, withoutCorrect, writeReasons, type Extracted } from '../lib/ai'
 import { supabase } from '../lib/supabase'
 import { UNSURE, type Misconception } from '../lib/scoring'
+import { topicLabel } from '../lib/topicNames'
 
 type Draft = Extracted & { correct: string | null; misconceptions: Record<string, Misconception> | null }
 
@@ -17,7 +18,7 @@ export default function NewQuiz({ groupId, onSaved }: { groupId: string; onSaved
     setBusy(true)
     setError('')
     try {
-      const res = await extract(text)
+      const res = await extract(text, groupId)
       if (res.questions.length === 0) {
         setError('Mətndə sual tapılmadı.')
       } else {
@@ -38,6 +39,8 @@ export default function NewQuiz({ groupId, onSaved }: { groupId: string; onSaved
     try {
       const reasons = await writeReasons(
         draft.map((q, i) => ({ position: i + 1, text: q.text, options: q.options, correct_label: q.correct! })),
+        undefined,
+        groupId,
       )
       setDraft((d) => d && d.map((q, i) => ({ ...q, misconceptions: reasons[i + 1] ?? null })))
     } catch {
@@ -127,7 +130,7 @@ export default function NewQuiz({ groupId, onSaved }: { groupId: string; onSaved
       <p className="text-sm text-gray-600">Hər sual üçün düzgün cavabı toxunaraq seçin.</p>
       {draft.map((q, i) => (
         <div key={i} className="space-y-2 rounded-xl border border-gray-300 p-3">
-          <p className="font-medium">
+          <p className="whitespace-pre-line font-medium">
             {i + 1}. {q.text}
           </p>
           <select
@@ -139,7 +142,7 @@ export default function NewQuiz({ groupId, onSaved }: { groupId: string; onSaved
           >
             {[...topics, UNSURE].map((t) => (
               <option key={t} value={t}>
-                {t}
+                {topicLabel(t)}
               </option>
             ))}
           </select>
@@ -161,7 +164,7 @@ export default function NewQuiz({ groupId, onSaved }: { groupId: string; onSaved
                       ? 'Səbəb məlum deyil'
                       : `Ehtimal olunan səbəb: ${m.reason}${
                           m.calculation ? ` (ehtimal olunan hesablama: ${m.calculation})` : ''
-                        }`}
+                        }${m.unchecked ? ' (yoxlanılmayıb)' : ''}`}
                   </p>
                 )}
               </div>

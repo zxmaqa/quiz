@@ -1,6 +1,12 @@
 import { createClient } from 'npm:@supabase/supabase-js@2'
 import { buildExtractPrompt, buildReasonsPrompt, PROMPT_VERSION, type QuizQuestion } from './prompt.ts'
 import { TOPICS } from './topics.ts'
+import {
+  buildKimyaExtractPrompt,
+  buildKimyaReasonsPrompt,
+  PROMPT_VERSION as KIMYA_PROMPT_VERSION,
+} from './prompt_kimya.ts'
+import { KIMYA_TOPICS } from './topics_kimya.ts'
 
 const DEFAULT_MODEL = 'claude-haiku-4-5'
 const FALLBACK_MODELS = ['gemini-3.8-flash', 'gemini-3.5-flash-lite']
@@ -244,7 +250,7 @@ function cleanExtracted(data: any) {
   }))
 }
 
-type Misconception = { reason: string; calculation?: string; confidence?: string }
+type Misconception = { reason: string; calculation?: string; confidence?: string; unchecked?: boolean }
 
 // Every wrong option gets either a checked reason or { reason: "unknown" } plus a recorded cause.
 // The correct option never gets an entry.
@@ -289,6 +295,104 @@ function cleanReasons(data: any, questions: QuizQuestion[]) {
   return { questions: out, unknown, droppedCorrect }
 }
 
+// ---- chemistry (separate from the math path above) ----------------------------------------------
+
+const KIMYA_IDS = KIMYA_TOPICS.map((t) => t.id)
+
+// Topic must be one of K01..K33 or UNSURE. Anything else becomes UNSURE and is reported for ai_calls.
+// deno-lint-ignore no-explicit-any
+function cleanExtractedKimya(data: any) {
+  const invalidTopics: { position: number; returned: string }[] = []
+  // deno-lint-ignore no-explicit-any
+  const questions = data.questions.map((q: any, i: number) => {
+    const position = Number.isInteger(q?.position) ? q.position : i + 1
+    const returned = typeof q?.topic === 'string' ? q.topic.trim() : ''
+    const topic = KIMYA_IDS.includes(returned.toUpperCase()) ? returned.toUpperCase() : 'UNSURE'
+    if (topic === 'UNSURE' && returned.toUpperCase() !== 'UNSURE') invalidTopics.push({ position, returned })
+    return {
+      position,
+      text: String(q?.text ?? ''),
+      // deno-lint-ignore no-explicit-any
+      options: (Array.isArray(q?.options) ? q.options : []).map((o: any) => ({
+        label: String(o?.label ?? '').toUpperCase(),
+        text: String(o?.text ?? ''),
+      })),
+      topic,
+    }
+  })
+  return { questions, invalidTopics }
+}
+
+type OptionRecord = {
+  ai_reason: string
+  ai_calculation: string
+  check_applicable: boolean
+  check_passed: boolean | null
+  unknown_reason: string
+}
+
+// Calculation questions (every option is a plain number): the reason must pass the arithmetic check,
+// otherwise it becomes unknown. Concept questions: no check; the reason is kept only when the model
+// said "high", and it is marked unchecked.
+// deno-lint-ignore no-explicit-any
+function cleanReasonsKimya(data: any, questions: QuizQuestion[]) {
+  const unknown: Record<string, Record<string, string>> = {}
+  const perOption: Record<string, Record<string, OptionRecord>> = {}
+  const droppedCorrect: string[] = []
+  const out = questions.map((q) => {
+    // deno-lint-ignore no-explicit-any
+    const entry = data.questions.find((x: any) => x?.position === q.position)
+    const raw = entry?.misconceptions && typeof entry.misconceptions === 'object' ? entry.misconceptions : {}
+    const checkApplicable = q.options.every((o) => optionValue(o.text) !== null)
+    const misconceptions: Record<string, Misconception> = {}
+    for (const o of q.options) {
+      const m = raw[o.label]
+      const reason = typeof m?.reason === 'string' ? m.reason.trim() : ''
+      const gaveReason = reason !== '' && reason.toLowerCase() !== 'unknown'
+      if (o.label === q.correct_label) {
+        if (gaveReason) droppedCorrect.push(`${q.position}${o.label}`)
+        continue
+      }
+      const record: OptionRecord = {
+        ai_reason: gaveReason ? reason : '',
+        ai_calculation: typeof m?.calculation === 'string' ? m.calculation : '',
+        check_applicable: checkApplicable,
+        check_passed: null,
+        unknown_reason: '',
+      }
+      ;(perOption[q.position] ??= {})[o.label] = record
+      const markUnknown = (cause: string) => {
+        misconceptions[o.label] = { reason: 'unknown' }
+        record.unknown_reason = cause
+        ;(unknown[q.position] ??= {})[o.label] = cause
+      }
+      if (!gaveReason) {
+        markUnknown('model_unknown')
+        continue
+      }
+      if (checkApplicable) {
+        const failure = checkCalculation(m.calculation, q.text, o.text)
+        record.check_passed = failure === null
+        if (failure) {
+          markUnknown(`check_failed: ${failure}`)
+          continue
+        }
+        misconceptions[o.label] = {
+          reason,
+          calculation: m.calculation.trim(),
+          ...(['high', 'medium', 'low'].includes(m.confidence) ? { confidence: m.confidence } : {}),
+        }
+      } else if (m.confidence === 'high') {
+        misconceptions[o.label] = { reason, confidence: 'high', unchecked: true }
+      } else {
+        markUnknown('unchecked_not_high_confidence')
+      }
+    }
+    return { position: q.position, misconceptions }
+  })
+  return { questions: out, unknown, perOption, droppedCorrect }
+}
+
 // deno-lint-ignore no-explicit-any
 function parseQuestions(raw: any): QuizQuestion[] | null {
   if (!Array.isArray(raw) || raw.length === 0 || raw.length > 50) return null
@@ -314,10 +418,22 @@ Deno.serve(async (req) => {
   } catch {
     return json({ error: 'Invalid JSON body' }, 400)
   }
-  const { quiz_id, text, model, step } = input ?? {}
+  const { quiz_id, group_id, text, model, step } = input ?? {}
   if (step !== 'extract' && step !== 'reasons') return json({ error: 'step must be "extract" or "reasons"' }, 400)
   if (model != null && !/^[A-Za-z0-9._-]+$/.test(model)) return json({ error: 'Invalid model' }, 400)
   if (quiz_id != null && !/^[0-9a-f-]{36}$/i.test(quiz_id)) return json({ error: 'Invalid quiz_id' }, 400)
+  if (group_id != null && !/^[0-9a-f-]{36}$/i.test(group_id)) return json({ error: 'Invalid group_id' }, 400)
+
+  // The group decides the subject: chemistry uses K01..K33 and the chemistry prompts; everything else is math (v5).
+  let groupId: string | null = group_id ?? null
+  if (!groupId && quiz_id) {
+    const { data } = await db.from('quizzes').select('group_id').eq('id', quiz_id).maybeSingle()
+    groupId = data?.group_id ?? null
+  }
+  const { data: group } = groupId
+    ? await db.from('groups').select('subject').eq('id', groupId).maybeSingle()
+    : { data: null }
+  const chemistry = group?.subject === 'chemistry'
 
   let prompt: string
   let questions: QuizQuestion[] | null = null
@@ -325,11 +441,11 @@ Deno.serve(async (req) => {
     if (typeof text !== 'string' || !text.trim() || text.length > MAX_TEXT) {
       return json({ error: `text is required (max ${MAX_TEXT} characters)` }, 400)
     }
-    prompt = buildExtractPrompt(text, TOPICS)
+    prompt = chemistry ? buildKimyaExtractPrompt(text) : buildExtractPrompt(text, TOPICS)
   } else {
     questions = parseQuestions(input.questions)
     if (!questions) return json({ error: 'questions with position, text, options and correct_label are required' }, 400)
-    prompt = buildReasonsPrompt(questions, TOPICS)
+    prompt = chemistry ? buildKimyaReasonsPrompt(questions) : buildReasonsPrompt(questions, TOPICS)
   }
 
   const quizId: string | null = quiz_id ?? null
@@ -347,6 +463,48 @@ Deno.serve(async (req) => {
     }
   }
   if (!result.ok) return json({ error: result.error }, 502)
+
+  if (chemistry) {
+    if (step === 'extract') {
+      const ex = cleanExtractedKimya(result.data)
+      await db
+        .from('ai_calls')
+        .update({
+          details: { step, subject: 'chemistry', prompt_version: KIMYA_PROMPT_VERSION, invalid_topics: ex.invalidTopics },
+        })
+        .eq('id', logId)
+      return json({
+        step,
+        questions: ex.questions,
+        topics: KIMYA_IDS,
+        invalid_topics: ex.invalidTopics,
+        model: used,
+        prompt_version: KIMYA_PROMPT_VERSION,
+      })
+    }
+    const kc = cleanReasonsKimya(result.data, questions!)
+    await db
+      .from('ai_calls')
+      .update({
+        details: {
+          step,
+          subject: 'chemistry',
+          prompt_version: KIMYA_PROMPT_VERSION,
+          unknown: kc.unknown,
+          per_option: kc.perOption,
+          correct_option_reasons_dropped: kc.droppedCorrect,
+        },
+      })
+      .eq('id', logId)
+    return json({
+      step,
+      questions: kc.questions,
+      unknown_reasons: kc.unknown,
+      per_option: kc.perOption,
+      model: used,
+      prompt_version: KIMYA_PROMPT_VERSION,
+    })
+  }
 
   if (step === 'extract') {
     return json({ step, questions: cleanExtracted(result.data), topics: TOPICS, model: used, prompt_version: PROMPT_VERSION })

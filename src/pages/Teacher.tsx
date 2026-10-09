@@ -47,7 +47,7 @@ export default function Teacher() {
         .map((q) => `${q.position}. ${q.text}\n${q.options.map((o) => `${o.label}) ${o.text}`).join('\n')}`)
         .join('\n\n')
       // call 1 fills topics, call 2 gets the stored correct answers and writes the reasons
-      const topics = await extract(text)
+      const topics = await extract(text, groupId)
       const reasons = await writeReasons(
         questions.map((q) => ({
           position: q.position,
@@ -56,6 +56,7 @@ export default function Teacher() {
           correct_label: q.correct_label,
         })),
         quizId,
+        groupId,
       )
       const results = await Promise.all(
         questions.map((q) => {

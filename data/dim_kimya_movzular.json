@@ -1,0 +1,480 @@
+{
+  "fenn": "Kimya",
+  "versiya": "kimya v1 — 2026-10-09 14:25 (Bakı). Açar söz qaydası AI nəticələri görülməzdən əvvəl donub.",
+  "menbe": "Komanda tərəfindən Azərbaycan məktəb kimya kursunun (VII–XI siniflər) bölmələri əsasında tərtib edilib. DİM-in rəsmi proqramı deyil; rəsmi proqram internetdə tapılmadı. Kimya müəllimi təsdiq etməlidir. Disclosure-da belə yazılmalıdır.",
+  "unsure": "UNSURE",
+  "ai_qaydasi": "Hər suala yalnız bir əsas mövzu ID-si (K01–K33) və ya UNSURE verilir. Siyahıda olmayan mövzu yazmaq olmaz.",
+  "ai_ucun": "AI promptuna hər mövzudan yalnız id, ad və ehate verilir. acar_sozler yalnız baseline üçündür, prompta qoyulmur.",
+  "acar_soz_qaydasi_T2": "Riyaziyyat siyahısı ilə eyni qayda, eyni kod: eval/t2_topic_eval.py (kiçik hərf İ→i, I→ı; açar söz sözün əvvəlində; ən çox fərqli açar söz; bərabərlikdə daha uzun açar söz; yenə bərabər və ya 0 → UNSURE).",
+  "movzular": [
+    {
+      "id": "K01",
+      "ad": "Kimyanın əsas anlayışları",
+      "ehate": "maddə, element, qarışıq, fiziki və kimyəvi hadisələr, kimyəvi formul, valentlik",
+      "acar_sozler": [
+        "saf maddə",
+        "qarışıq",
+        "fiziki hadisə",
+        "kimyəvi hadisə",
+        "valentlik",
+        "allotrop",
+        "kimyəvi formul"
+      ]
+    },
+    {
+      "id": "K02",
+      "ad": "Mol. Molyar kütlə və molyar həcm",
+      "ehate": "mol, Avoqadro ədədi, molyar kütlə, normal şəraitdə molyar həcm, elementin kütlə payı, formulun tapılması, qazların nisbi sıxlığı",
+      "acar_sozler": [
+        "mol",
+        "molyar kütlə",
+        "molyar həcm",
+        "avoqadro",
+        "22,4",
+        "n.ş.",
+        "normal şərait",
+        "elementin kütlə payı",
+        "ən sadə formul",
+        "nisbi sıxlı",
+        "qaz qarışığ"
+      ]
+    },
+    {
+      "id": "K03",
+      "ad": "Reaksiya tənliyi üzrə hesablamalar",
+      "ehate": "stexiometriya, artıq və çatışmayan maddə, praktiki çıxım, qarışığın tərkibi",
+      "acar_sozler": [
+        "reaksiya tənliyi üzrə",
+        "artıq götürül",
+        "artıqla",
+        "çıxım",
+        "praktiki",
+        "nəzəri olaraq",
+        "stexiometr"
+      ]
+    },
+    {
+      "id": "K04",
+      "ad": "Atomun quruluşu",
+      "ehate": "proton, neytron, elektron, izotoplar, elektron konfiqurasiyası, orbitallar, kvant ədədləri",
+      "acar_sozler": [
+        "proton",
+        "neytron",
+        "izotop",
+        "elektron konfiqurasiya",
+        "orbital",
+        "kvant ədəd",
+        "enerji səviyyə",
+        "yarımsəviyyə",
+        "nüvənin yükü",
+        "cütləşməmiş elektron"
+      ]
+    },
+    {
+      "id": "K05",
+      "ad": "Dövri qanun və dövri sistem",
+      "ehate": "dövr və qruplar, elektromənfilik, atom radiusu, ionlaşma enerjisi, xassələrin dəyişməsi",
+      "acar_sozler": [
+        "dövri sistem",
+        "dövri qanun",
+        "elektromənfilik",
+        "atom radius",
+        "ionlaşma enerji",
+        "metallıq xassə",
+        "qeyri-metallıq"
+      ]
+    },
+    {
+      "id": "K06",
+      "ad": "Kimyəvi rabitə",
+      "ehate": "kovalent (polyar, qeyri-polyar), ion, metal, hidrogen rabitəsi, donor-akseptor, σ və π rabitələr, rabitə enerjisi və uzunluğu",
+      "acar_sozler": [
+        "kovalent",
+        "ion rabitə",
+        "metal rabitə",
+        "hidrogen rabitə",
+        "donor-akseptor",
+        "σ",
+        "π",
+        "sigma",
+        "rabitə",
+        "rabitə enerji",
+        "rabitəsinin enerji",
+        "rabitə uzunluğ",
+        "rabitəsinin uzunluğ",
+        "polyar"
+      ]
+    },
+    {
+      "id": "K07",
+      "ad": "Hibridləşmə və molekulun fəza quruluşu",
+      "ehate": "sp, sp2, sp3 hibridləşmə, valent bucağı, molekulun forması",
+      "acar_sozler": [
+        "hibrid",
+        "sp2",
+        "sp3",
+        "sp-",
+        "sp hibrid",
+        "valent bucağ",
+        "tetraedr",
+        "fəza quruluş",
+        "xətti quruluş"
+      ]
+    },
+    {
+      "id": "K08",
+      "ad": "Kristal qəfəslər və aqreqat hallar",
+      "ehate": "ion, atom, molekul və metal kristal qəfəsləri",
+      "acar_sozler": [
+        "kristal qəfəs",
+        "qəfəs",
+        "aqreqat hal",
+        "amorf"
+      ]
+    },
+    {
+      "id": "K09",
+      "ad": "Reaksiyaların təsnifatı. Termokimya",
+      "ehate": "birləşmə, parçalanma, əvəzetmə, mübadilə reaksiyaları; ekzo- və endotermik reaksiyalar, termokimyəvi tənlik, Hess qanunu",
+      "acar_sozler": [
+        "ekzotermik",
+        "endotermik",
+        "istilik effekt",
+        "termokimyəvi",
+        "kc/mol",
+        "kj",
+        "hess",
+        "əmələgəlmə istiliy",
+        "yanma istiliy",
+        "birləşmə reaksiya",
+        "parçalanma reaksiya",
+        "əvəzetmə reaksiya",
+        "mübadilə reaksiya"
+      ]
+    },
+    {
+      "id": "K10",
+      "ad": "Kimyəvi reaksiyanın sürəti",
+      "ehate": "sürətə təsir edən amillər, katalizator, Vant-Hoff qaydası, aktivləşmə enerjisi",
+      "acar_sozler": [
+        "reaksiyanın sürət",
+        "sürət sabit",
+        "katalizator",
+        "vant-hoff",
+        "temperatur əmsal",
+        "aktivləşmə enerji",
+        "inhibitor"
+      ]
+    },
+    {
+      "id": "K11",
+      "ad": "Kimyəvi tarazlıq",
+      "ehate": "Le Şatelye prinsipi, tarazlıq sabiti, tarazlığın yerdəyişməsi",
+      "acar_sozler": [
+        "tarazlı",
+        "le şatelye",
+        "dönər"
+      ]
+    },
+    {
+      "id": "K12",
+      "ad": "Məhlullar və qatılıq",
+      "ehate": "məhlulda kütlə payı, molyar qatılıq, həllolma, kristalhidratlar, durulaşdırma və qarışdırma",
+      "acar_sozler": [
+        "məhlul",
+        "qatılıq",
+        "həll olma",
+        "həllolma",
+        "kristalhidrat",
+        "durulaşdır",
+        "buxarlandır"
+      ]
+    },
+    {
+      "id": "K13",
+      "ad": "Elektrolitik dissosiasiya və ion mübadiləsi",
+      "ehate": "elektrolitlər, dissosiasiya dərəcəsi, ion tənlikləri, mühit, pH, indikatorlar",
+      "acar_sozler": [
+        "elektrolit",
+        "dissosiasiya",
+        "ion tənliy",
+        "qısa ion",
+        "ph",
+        "indikator",
+        "fenolftalein",
+        "lakmus",
+        "metiloranj"
+      ]
+    },
+    {
+      "id": "K14",
+      "ad": "Duzların hidrolizi",
+      "ehate": "hidroliz tipləri, məhlulun mühiti",
+      "acar_sozler": [
+        "hidroliz"
+      ]
+    },
+    {
+      "id": "K15",
+      "ad": "Oksidləşmə-reduksiya reaksiyaları",
+      "ehate": "oksidləşmə dərəcəsi, oksidləşdirici və reduksiyaedici, elektron balansı",
+      "acar_sozler": [
+        "oksidləşmə dərəcə",
+        "oksidləşdirici",
+        "reduksiyaedici",
+        "reduksiya",
+        "elektron balans",
+        "redoks",
+        "oksidləşmə-reduksiya"
+      ]
+    },
+    {
+      "id": "K16",
+      "ad": "Elektroliz. Gərginlik sırası",
+      "ehate": "ərintilərin və məhlulların elektrolizi, katod və anod prosesləri, metalların gərginlik sırası",
+      "acar_sozler": [
+        "elektroliz",
+        "katod",
+        "anod",
+        "gərginlik sıra",
+        "qalvanik"
+      ]
+    },
+    {
+      "id": "K17",
+      "ad": "Qeyri-üzvi birləşmələrin sinifləri",
+      "ehate": "oksidlər, əsaslar, turşular, duzlar, amfoterlik, genetik əlaqə",
+      "acar_sozler": [
+        "oksid",
+        "duz",
+        "amfoter",
+        "genetik əlaqə",
+        "qələvi",
+        "turşu oksid",
+        "əsasi oksid"
+      ]
+    },
+    {
+      "id": "K18",
+      "ad": "Hidrogen və halogenlər",
+      "ehate": "hidrogen, halogenlər və onların birləşmələri",
+      "acar_sozler": [
+        "halogen",
+        "xlor",
+        "flüor",
+        "brom",
+        "yod",
+        "hcl"
+      ]
+    },
+    {
+      "id": "K19",
+      "ad": "Oksigen və kükürd",
+      "ehate": "oksigen, ozon, kükürd və birləşmələri, sulfat turşusu",
+      "acar_sozler": [
+        "kükürd",
+        "sulfat",
+        "sulfid",
+        "sulfit",
+        "ozon",
+        "h2so4",
+        "so2",
+        "so3"
+      ]
+    },
+    {
+      "id": "K20",
+      "ad": "Azot və fosfor",
+      "ehate": "azot, ammonyak, nitrat turşusu, fosfor və birləşmələri, gübrələr",
+      "acar_sozler": [
+        "azot",
+        "ammonyak",
+        "nitrat",
+        "fosfor",
+        "fosfat",
+        "gübrə",
+        "hno3",
+        "nh3"
+      ]
+    },
+    {
+      "id": "K21",
+      "ad": "Karbon və silisium (qeyri-üzvi)",
+      "ehate": "karbon oksidləri, karbonatlar, silisium və silikatlar",
+      "acar_sozler": [
+        "silisium",
+        "silikat",
+        "karbonat",
+        "dəm qazı",
+        "co2",
+        "karbon qazı",
+        "şüşə"
+      ]
+    },
+    {
+      "id": "K22",
+      "ad": "Metalların ümumi xassələri",
+      "ehate": "metalların alınması, korroziya, ərintilər",
+      "acar_sozler": [
+        "metalların",
+        "korroziya",
+        "ərinti",
+        "metallurgiya",
+        "aktiv metal"
+      ]
+    },
+    {
+      "id": "K23",
+      "ad": "Qələvi, qələvi-torpaq metallar, alüminium, dəmir",
+      "ehate": "IA, IIA metallar, alüminium, dəmir və onların birləşmələri, suyun codluğu",
+      "acar_sozler": [
+        "natrium",
+        "kalium",
+        "kalsium",
+        "maqnezium",
+        "alüminium",
+        "dəmir",
+        "codluq",
+        "qələvi metal",
+        "qələvi-torpaq"
+      ]
+    },
+    {
+      "id": "K24",
+      "ad": "Üzvi kimyanın əsasları",
+      "ehate": "quruluş nəzəriyyəsi, izomeriya, homoloji sıra, nomenklatura, funksional qruplar",
+      "acar_sozler": [
+        "izomer",
+        "homoloq",
+        "homoloji",
+        "nomenklatura",
+        "quruluş nəzəriyyə",
+        "butlerov",
+        "funksional qrup"
+      ]
+    },
+    {
+      "id": "K25",
+      "ad": "Alkanlar və tsikloalkanlar",
+      "ehate": "doymuş karbohidrogenlər, xassələri və alınması",
+      "acar_sozler": [
+        "alkan",
+        "metan",
+        "etan",
+        "propan",
+        "butan",
+        "tsikloalkan",
+        "doymuş karbohidrogen"
+      ]
+    },
+    {
+      "id": "K26",
+      "ad": "Alkenlər, alkadienlər, alkinlər",
+      "ehate": "doymamış karbohidrogenlər, kauçuk",
+      "acar_sozler": [
+        "alken",
+        "alkin",
+        "alkadien",
+        "etilen",
+        "asetilen",
+        "propilen",
+        "doymamış",
+        "kauçuk",
+        "butadien"
+      ]
+    },
+    {
+      "id": "K27",
+      "ad": "Arenlər. Karbohidrogenlərin təbii mənbələri",
+      "ehate": "benzol və homoloqları, neft, təbii qaz, krekinq",
+      "acar_sozler": [
+        "benzol",
+        "aren",
+        "toluol",
+        "aromatik",
+        "neft",
+        "krekinq",
+        "rektifikasiya"
+      ]
+    },
+    {
+      "id": "K28",
+      "ad": "Spirtlər və fenollar",
+      "ehate": "biratomlu və çoxatomlu spirtlər, fenol",
+      "acar_sozler": [
+        "spirt",
+        "etanol",
+        "metanol",
+        "qliserin",
+        "etilenqlikol",
+        "fenol"
+      ]
+    },
+    {
+      "id": "K29",
+      "ad": "Aldehidlər, ketonlar, karbon turşuları",
+      "ehate": "karbonil və karboksil birləşmələri",
+      "acar_sozler": [
+        "aldehid",
+        "keton",
+        "aseton",
+        "formaldehid",
+        "karbon turşu",
+        "sirkə turşu",
+        "asetat",
+        "karboksil"
+      ]
+    },
+    {
+      "id": "K30",
+      "ad": "Mürəkkəb efirlər və yağlar",
+      "ehate": "efirləşmə, yağlar, sabun",
+      "acar_sozler": [
+        "mürəkkəb efir",
+        "efir",
+        "yağ",
+        "sabun",
+        "efirləşmə",
+        "esterləşmə"
+      ]
+    },
+    {
+      "id": "K31",
+      "ad": "Karbohidratlar",
+      "ehate": "qlükoza, fruktoza, saxaroza, nişasta, sellüloza",
+      "acar_sozler": [
+        "karbohidrat",
+        "qlükoza",
+        "fruktoza",
+        "saxaroza",
+        "nişasta",
+        "sellüloza"
+      ]
+    },
+    {
+      "id": "K32",
+      "ad": "Azotlu üzvi birləşmələr",
+      "ehate": "aminlər, anilin, aminturşular, zülallar",
+      "acar_sozler": [
+        "amin",
+        "anilin",
+        "aminturşu",
+        "zülal",
+        "peptid"
+      ]
+    },
+    {
+      "id": "K33",
+      "ad": "Polimerlər",
+      "ehate": "polimerləşmə, polikondensləşmə, plastik kütlələr, liflər",
+      "acar_sozler": [
+        "polimer",
+        "polikondens",
+        "monomer",
+        "polietilen",
+        "plastik",
+        "lif"
+      ]
+    }
+  ]
+}

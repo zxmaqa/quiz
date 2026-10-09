@@ -5,6 +5,7 @@ export type Misconception = {
   reason: string
   calculation?: string | null
   confidence?: 'high' | 'medium' | 'low'
+  unchecked?: boolean // chemistry concept question: reason was not arithmetic-checked
 }
 
 export type Question = {
@@ -85,7 +86,7 @@ export function analyzeStudent(questions: Question[], answers: Answers) {
 
   const counts = new Map<string, StrongSignal>()
   for (const { misconception } of missed) {
-    if (!misconception) continue
+    if (!misconception || misconception.unchecked) continue
     const key = normalize(misconception.reason)
     const entry = counts.get(key) ?? { reason: misconception.reason, count: 0 }
     entry.count += 1

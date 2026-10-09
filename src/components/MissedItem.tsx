@@ -6,7 +6,7 @@ export default function MissedItem({ item, answerLabel }: { item: Missed; answer
 
   return (
     <div className="space-y-1 rounded-xl border border-gray-300 p-3">
-      <p className="font-medium">
+      <p className="whitespace-pre-line font-medium">
         {q.position}. {q.text}
       </p>
       <p className="text-red-700">
@@ -22,6 +22,7 @@ export default function MissedItem({ item, answerLabel }: { item: Missed; answer
       {misconception && (
         <p className="text-sm text-gray-700">
           Ehtimal olunan səbəb: {misconception.reason}
+          {misconception.unchecked && <> (yoxlanılmayıb)</>}
           {misconception.calculation && <> (ehtimal olunan hesablama: {misconception.calculation})</>}
         </p>
       )}

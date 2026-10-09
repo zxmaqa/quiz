@@ -1,0 +1,1170 @@
+{
+  "quizzes": [
+    {
+      "quiz_id": "MIQ_2025-09-03",
+      "questions": [
+        {
+          "id": "MIQ_2025-09-03_Q1",
+          "question_text": "2XY2(q) → X2(q) + 2Y2(q) reaksiyasında 1,2 mol XY2 qazından 25% çıxımla X2 və Y2 qazları əmələ gəlir.\nHansı ifadələr doğrudur?\nI. 0,6 mol Y2 qazı əmələ gəlir.\nII. Molekul sayı 1,5 dəfə artır\nIII. 0,9 mol XY2 qazı artıq qalır.",
+          "options": {
+            "A": "yalnız I",
+            "B": "yalnız II",
+            "C": "yalnız III",
+            "D": "I, III",
+            "E": "I, II, III"
+          },
+          "correct": "C",
+          "topic": "Mol və stexiometriya",
+          "subtopics": [
+            "Reaksiya çıxımı",
+            "Məhsul və qalıq miqdarı",
+            "Molekul sayının dəyişməsi"
+          ],
+          "difficulty": 2,
+          "solution_steps": [
+            "Parçalanan XY2: 1,2 × 0,25 = 0,3 mol; qalan XY2: 1,2 − 0,3 = 0,9 mol.",
+            "Tənlikdəki nisbətə görə n(X2) = 0,3/2 = 0,15 mol və n(Y2) = 0,3 mol.",
+            "Son ümumi miqdar: 0,9 + 0,15 + 0,3 = 1,35 mol; artım 1,35/1,2 = 1,125 dəfədir.",
+            "I və II yanlışdır, yalnız III doğrudur."
+          ],
+          "key_formula": "n(məhsul) = n(sərf olunan reagent) × ν(məhsul)/ν(reagent); n(qalıq) = n(ilkin) − n(sərf olunan)",
+          "wrong_options": {
+            "A": {
+              "likely_mistake": "0,3 mol parçalanan XY2-ni Y2-nin 2 əmsalına vurub 0,6 mol almaq, XY2-nin 2 əmsalına bölməyi unutmaq; düzgün III ifadəsini isə seçimdən kənarda saxlamaq.",
+              "misconception_tag": "stexiometrik_nisbet_sehvi",
+              "feedback_az": "Y2-nin əmsalını XY2-nin əmsalına bölməlisən: 2/2 = 1 olduğundan 0,3 mol Y2 yaranır. Qalan XY2 0,9 mol olduğu üçün yalnız III doğrudur."
+            },
+            "B": {
+              "likely_mistake": "25% çevrilməni nəzərə almadan bütün qaz üçün tənliyin 3/2 = 1,5 mol nisbətini tətbiq etmək; reaksiyaya girməyən XY2-ni yoxlamamaq.",
+              "misconception_tag": "qismen_cevrilmeni_tam_sayma",
+              "feedback_az": "3/2 nisbətini yalnız reaksiyaya girən hissəyə tətbiq etməlisən. Qalıqla birlikdə son miqdar 1,35 mol, artım 1,125 dəfədir və III doğrudur."
+            },
+            "D": {
+              "likely_mistake": "III-ü düzgün hesablamaq, lakin Y2 üçün 0,3 × 2 = 0,6 mol yazaraq reagentin 2 əmsalına bölməyi unutmaq.",
+              "misconception_tag": "stexiometrik_nisbet_sehvi",
+              "feedback_az": "0,9 mol XY2 qalmasını düzgün müəyyən etmisən. Y2 üçün əmsalların nisbəti 2/2 olduğundan I yanlışdır və yalnız III qalır."
+            },
+            "E": {
+              "likely_mistake": "Y2-ni 0,3 × 2 = 0,6 mol saymaq və qismən çevrilməyə tam çevrilmənin 3/2 = 1,5 artımını tətbiq etmək; III-ü düzgün tapmaq.",
+              "misconception_tag": "birlesmis_stexiometriya_sehvi",
+              "feedback_az": "Məhsul miqdarını əmsalların nisbəti ilə, ümumi miqdarı isə qalıq da daxil olmaqla hesablamalısan. Bu iki düzəlişlə I və II yanlış, yalnız III doğru alınır."
+            }
+          },
+          "prerequisites": [
+            "mol_ve_stexiometriya",
+            "reaksiya_tenliyi"
+          ],
+          "related_concepts": [
+            "reaksiya_ciximi",
+            "qaz_miqdari"
+          ],
+          "related_questions": [
+            "MIQ_2025-09-03_Q5",
+            "MIQ_2024-10-03_Q1",
+            "MIQ_2024-10-03_Q3"
+          ],
+          "review_tip": "Qismən çevrilmədə sərf olunan reagent, məhsullar və qalıq üçün ayrıca mol hesabını təkrar et.",
+          "confidence": "high",
+          "disagreement_note": null,
+          "dim_primary_topic": "K03",
+          "dim_secondary_topics": [
+            "K02"
+          ],
+          "topic_confidence": "high",
+          "topic_note": null
+        },
+        {
+          "id": "MIQ_2025-09-03_Q2",
+          "question_text": "25 °C-də 0,05 mol HCl olan 500 ml məhlulun pH dəyərini hesablayın.",
+          "options": {
+            "A": "1",
+            "B": "2",
+            "C": "3",
+            "D": "4",
+            "E": "5"
+          },
+          "correct": "A",
+          "topic": "Məhlullar və pH",
+          "subtopics": [
+            "Molyar qatılıq",
+            "Güclü turşunun dissosiasiyası",
+            "Həcm vahidləri"
+          ],
+          "difficulty": 1,
+          "solution_steps": [
+            "500 ml = 0,5 L.",
+            "c(HCl) = n/V = 0,05/0,5 = 0,1 M.",
+            "HCl tam dissosiasiya etdiyindən [H+] = 0,1 M.",
+            "pH = −lg(0,1) = 1."
+          ],
+          "key_formula": "c = n/V(L); pH = −lg[H+]",
+          "wrong_options": {
+            "B": {
+              "likely_mistake": "500 ml-i səhvən 5 L çevirmək: 0,05/5 = 0,01 M və pH = 2.",
+              "misconception_tag": "hecm_cevrilmesi_sehvi",
+              "feedback_az": "500 ml-i 1000-ə bölərək 0,5 L almalısan. Bu həcmdə qatılıq 0,1 M və pH 1-dir."
+            },
+            "C": {
+              "likely_mistake": "təsadüfi / aydın deyil",
+              "misconception_tag": "aydin_deyil",
+              "feedback_az": "pH 3 olsaydı, [H+] = 0,001 M olmalı idi. Verilən miqdarı 0,5 L-ə bölsən, 0,1 M alarsan və pH 1 olar."
+            },
+            "D": {
+              "likely_mistake": "500 ml-i litrə çevirmədən V = 500 götürmək: 0,05/500 = 0,0001 və pH = 4.",
+              "misconception_tag": "hecm_cevrilmesi_sehvi",
+              "feedback_az": "Molyar qatılıqda həcmi litr ilə yazmalısan. V = 0,5 L götürdükdə [H+] = 0,1 M və pH 1 alınır."
+            },
+            "E": {
+              "likely_mistake": "təsadüfi / aydın deyil",
+              "misconception_tag": "aydin_deyil",
+              "feedback_az": "pH 5 seçimi [H+] = 0,00001 M deməkdir. Səndəki HCl miqdarı və həcm isə 0,1 M qatılıq verdiyindən pH 1 olmalıdır."
+            }
+          },
+          "prerequisites": [
+            "hecm_vahidleri",
+            "molyar_qatiliq",
+            "elektrolitik_dissosiasiya"
+          ],
+          "related_concepts": [
+            "ph_ve_guclu_tursu"
+          ],
+          "related_questions": [
+            "MIQ_2025-09-03_Q3"
+          ],
+          "review_tip": "Millilitri litrə çevirməyi və güclü turşu üçün pH = −lg[H+] düsturunu təkrar et.",
+          "confidence": "high",
+          "disagreement_note": null,
+          "dim_primary_topic": "K13",
+          "dim_secondary_topics": [
+            "K12"
+          ],
+          "topic_confidence": "high",
+          "topic_note": null
+        },
+        {
+          "id": "MIQ_2025-09-03_Q3",
+          "question_text": "Eyni həcmdə qatılığı 0,4 M olan MgCl2 məhlulu ilə qatılığı 0,6 M olan AlCl3 məhlulu qarışdırıldıqda alınan məhlulda Cl- ionun qatılığını müəyyən edin.",
+          "options": {
+            "A": "1,1",
+            "B": "1,2",
+            "C": "1,3",
+            "D": "1,4",
+            "E": "1,5"
+          },
+          "correct": "C",
+          "topic": "Məhlulların qarışdırılması",
+          "subtopics": [
+            "İon qatılığı",
+            "Dissosiasiya",
+            "Bərabər həcmli məhlullar"
+          ],
+          "difficulty": 2,
+          "solution_steps": [
+            "MgCl2 → Mg2+ + 2Cl-; ilkin [Cl-] = 0,4 × 2 = 0,8 M.",
+            "AlCl3 → Al3+ + 3Cl-; ilkin [Cl-] = 0,6 × 3 = 1,8 M.",
+            "Hər məhlulun həcmi V olduqda Cl- miqdarı 0,8V + 1,8V, ümumi həcm 2V-dir.",
+            "Son [Cl-] = (0,8 + 1,8)/2 = 1,3 M."
+          ],
+          "key_formula": "c(ion, qarışıq) = (ν1c1V1 + ν2c2V2)/(V1 + V2)",
+          "wrong_options": {
+            "A": {
+              "likely_mistake": "MgCl2-dən bir Cl- yarandığını qəbul etmək: (0,4 × 1 + 0,6 × 3)/2 = 1,1 M.",
+              "misconception_tag": "ion_indeksi_sehvi",
+              "feedback_az": "MgCl2-dəki 2 indeksi hər formul vahidindən iki Cl- yarandığını göstərir. Buna görə orta qatılığı (0,8 + 1,8)/2 hesablamalısan."
+            },
+            "B": {
+              "likely_mistake": "Qatılıqları duzlar arasında dəyişmək: MgCl2 üçün 0,6 M, AlCl3 üçün 0,4 M yazmaq; (0,6 × 2 + 0,4 × 3)/2 = 1,2 M.",
+              "misconception_tag": "qatiliqlari_yer_deyisme",
+              "feedback_az": "0,4 M qatılığını MgCl2-yə, 0,6 M qatılığını AlCl3-ə aid etməlisən. Uyğun ion sayları ilə hesabladıqda 1,3 M alınır."
+            },
+            "D": {
+              "likely_mistake": "təsadüfi / aydın deyil",
+              "misconception_tag": "aydin_deyil",
+              "feedback_az": "Hər məhlulun həcmini V götürüb xlorid ionlarının miqdarını ayrıca hesabla. Cəm 2,6V mol, həcm 2V olduğundan nəticə 1,3 M-dir."
+            },
+            "E": {
+              "likely_mistake": "MgCl2 üçün də AlCl3 kimi üç Cl- qəbul etmək: (0,4 × 3 + 0,6 × 3)/2 = 1,5 M.",
+              "misconception_tag": "ion_indeksi_sehvi",
+              "feedback_az": "Hər duzun öz formulundakı xlor indeksini istifadə etməlisən. MgCl2 iki, AlCl3 üç Cl- verdiyindən son qatılıq 1,3 M-dir."
+            }
+          },
+          "prerequisites": [
+            "molyar_qatiliq",
+            "elektrolitik_dissosiasiya"
+          ],
+          "related_concepts": [
+            "mehlullarin_qarisdirilmasi",
+            "mol_ve_stexiometriya"
+          ],
+          "related_questions": [
+            "MIQ_2025-09-03_Q2"
+          ],
+          "review_tip": "Dissosiasiyada ion sayını və qarışığın ümumi həcmini birlikdə nəzərə almağı təkrar et.",
+          "confidence": "high",
+          "disagreement_note": null,
+          "dim_primary_topic": "K12",
+          "dim_secondary_topics": [
+            "K13"
+          ],
+          "topic_confidence": "high",
+          "topic_note": null
+        },
+        {
+          "id": "MIQ_2025-09-03_Q4",
+          "question_text": "Rabitə | Rabitə enerjisi, kC/mol\nC=C | 620\nC-H | 414\nC=O | 745\nO-H | 460\nCədvələ əsasən C2H4-ün yanma reaksiyasında O=O rabitə enerjisini (kC/mol) hesablayın.\nC2H4-ün yanma istiliyi 1050 kC/mol-dur.",
+          "options": {
+            "A": "372",
+            "B": "424",
+            "C": "448",
+            "D": "498",
+            "E": "526"
+          },
+          "correct": "D",
+          "topic": "Rabitə enerjisi və termokimya",
+          "subtopics": [
+            "Yanma tənliyi",
+            "Qırılan və yaranan rabitələr",
+            "Ekzotermik reaksiyanın entalpiyası"
+          ],
+          "difficulty": 2,
+          "solution_steps": [
+            "Yanma tənliyi: C2H4 + 3O2 → 2CO2 + 2H2O; ΔH = −1050 kJ/mol.",
+            "Qırılan rabitələr: 1 C=C, 4 C-H və 3 O=O; enerji cəmi 620 + 4 × 414 + 3x = 2276 + 3x.",
+            "Yaranan rabitələr: 4 C=O və 4 O-H; enerji cəmi 4 × 745 + 4 × 460 = 4820 kJ/mol.",
+            "(2276 + 3x) − 4820 = −1050 tənliyindən x = 498 kJ/mol."
+          ],
+          "key_formula": "ΔH = ΣE(qırılan rabitələr) − ΣE(yaranan rabitələr)",
+          "wrong_options": {
+            "A": {
+              "likely_mistake": "təsadüfi / aydın deyil",
+              "misconception_tag": "aydin_deyil",
+              "feedback_az": "372-ni O=O enerjisi kimi yerinə yazsan, ΔH = 2276 + 3 × 372 − 4820 = −1428 kJ/mol alınar. Verilən −1050 kJ/mol-a uyğun qiyməti tapmaq üçün enerji balansını yenidən qurmalısan."
+            },
+            "B": {
+              "likely_mistake": "təsadüfi / aydın deyil",
+              "misconception_tag": "aydin_deyil",
+              "feedback_az": "424 ilə yoxlasan, ΔH = −1272 kJ/mol alınır. Qırılan üç O=O rabitəsini nəzərə alıb tənliyi həll etdikdə 498 kJ/mol taparsan."
+            },
+            "C": {
+              "likely_mistake": "təsadüfi / aydın deyil",
+              "misconception_tag": "aydin_deyil",
+              "feedback_az": "448 seçimi enerji balansında ΔH = −1200 kJ/mol verir. Verilən yanma istiliyinə uyğun gəlməsi üçün (2276 + 3x) − 4820 = −1050 yazmalısan."
+            },
+            "E": {
+              "likely_mistake": "təsadüfi / aydın deyil",
+              "misconception_tag": "aydin_deyil",
+              "feedback_az": "526 ilə enerji balansını yoxlasan, ΔH = −966 kJ/mol alınar. Yanma ekzotermik olduğundan −1050 qiymətini istifadə etməli və x = 498 tapmalısan."
+            }
+          },
+          "prerequisites": [
+            "reaksiya_tenliyi",
+            "entalpiya",
+            "sigma_ve_pi_rabiteleri"
+          ],
+          "related_concepts": [
+            "rabite_enerjisi"
+          ],
+          "related_questions": [
+            "MIQ_2024-10-03_Q2",
+            "MIQ_2024-10-03_Q4"
+          ],
+          "review_tip": "Yanma tənliyini tarazlaşdırıb hər növ rabitənin sayını ayrıca yazmağı təkrar et.",
+          "confidence": "high",
+          "disagreement_note": "Şəkildəki «kC/mol» vahidi verilmiş həllə uyğun olaraq kJ/mol kimi qəbul edilir; sual mətnində isə şəkildəki yazılış saxlanılıb.",
+          "dim_primary_topic": "K06",
+          "dim_secondary_topics": [
+            "K09",
+            "K03"
+          ],
+          "topic_confidence": "high",
+          "topic_note": null
+        },
+        {
+          "id": "MIQ_2025-09-03_Q5",
+          "question_text": "CaH2-in az miqdarda su ilə reaksiyası zamanı alınan bərk qalıqda oksigenin kütlə payı 20% olarsa, bərk nümunənin kütləsi neçə faiz artmışdır?",
+          "options": {
+            "A": "15",
+            "B": "20",
+            "C": "25",
+            "D": "28",
+            "E": "36"
+          },
+          "correct": "C",
+          "topic": "Kütlə payı və reaksiya balansı",
+          "subtopics": [
+            "Qismən reaksiya",
+            "Bərk qalıq",
+            "Kütlə artımının faizi"
+          ],
+          "difficulty": 3,
+          "solution_steps": [
+            "CaH2 + 2H2O → Ca(OH)2 + 2H2; M(CaH2) = 42, M(Ca(OH)2) = 74 q/mol.",
+            "Reaksiya verən CaH2 x mol, qalan CaH2 y mol olsun: m(son) = 74x + 42y və m(O) = 32x.",
+            "32x/(74x + 42y) = 0,2; buradan y = (43/21)x ≈ 2,048x.",
+            "x = 1 üçün ilkin kütlə 42(1 + 43/21) = 128 q, son kütlə 160 q-dır.",
+            "Kütlə artımı (160 − 128)/128 × 100% = 25%-dir."
+          ],
+          "key_formula": "w(O) = m(O)/m(son); artım% = (m(son) − m(ilkin))/m(ilkin) × 100%",
+          "wrong_options": {
+            "A": {
+              "likely_mistake": "təsadüfi / aydın deyil",
+              "misconception_tag": "aydin_deyil",
+              "feedback_az": "Oksigenin 20% payını son bərk kütləyə görə yazmalısan. Bu şərtdən ilkin və son kütlələri tapsan, artımın 15% deyil, 25% olduğunu görərsən."
+            },
+            "B": {
+              "likely_mistake": "32 q artımı ilkin 128 q əvəzinə son 160 q-a bölmək: 32/160 × 100% = 20%; oksigenin son kütlədəki payını artım faizi ilə eyniləşdirmək.",
+              "misconception_tag": "son_kutleni_esas_goturme",
+              "feedback_az": "20% oksigenin son bərk qalıqdakı kütlə payıdır. Artım faizini ilkin kütləyə bölməlisən: 32/128 × 100% = 25%."
+            },
+            "D": {
+              "likely_mistake": "təsadüfi / aydın deyil",
+              "misconception_tag": "aydin_deyil",
+              "feedback_az": "Reaksiyaya girməyən CaH2-ni bərk qalığın hesabına daxil etməlisən. 32x/(74x + 42y) = 0,2 şərtindən alınan kütlələrlə artım 25% olur."
+            },
+            "E": {
+              "likely_mistake": "təsadüfi / aydın deyil",
+              "misconception_tag": "aydin_deyil",
+              "feedback_az": "Bərk nümunənin artımını CaH2 və Ca(OH)2 kütlələri arasında hesablamalısan. Qaz halında ayrılan H2-ni bərk qalığa daxil etmədən qurulan balans 25% artım verir."
+            }
+          },
+          "prerequisites": [
+            "mol_kutle",
+            "mol_ve_stexiometriya",
+            "kutle_payi_ve_faiz"
+          ],
+          "related_concepts": [
+            "reaksiyada_kutle_balansi",
+            "artiq_ve_mehdudlasdirici_reagent"
+          ],
+          "related_questions": [
+            "MIQ_2025-09-03_Q1",
+            "MIQ_2024-10-03_Q1",
+            "MIQ_2024-10-03_Q3"
+          ],
+          "review_tip": "Son qarışığın kütlə payı ilə ilkin nümunəyə görə kütlə artımının fərqini təkrar et.",
+          "confidence": "high",
+          "disagreement_note": null,
+          "dim_primary_topic": "K03",
+          "dim_secondary_topics": [
+            "K02",
+            "K23"
+          ],
+          "topic_confidence": "high",
+          "topic_note": null
+        }
+      ]
+    },
+    {
+      "quiz_id": "MIQ_2024-10-03",
+      "questions": [
+        {
+          "id": "MIQ_2024-10-03_Q1",
+          "question_text": "Qapalı qabda eyni kütlədə götürülmüş pirit və oksigenin qarşılıqlı təsiri zamanı başlanğıc maddələrdən birindən 3,2 q artıq qalmışdır. Reaksiyadan sonra qabda olan qaz qarışığının miqdarını (mol) hesablayın. Mr(FeS2)=120, Mr(O2)=32",
+          "options": {
+            "A": "0,2",
+            "B": "0,3",
+            "C": "0,1",
+            "D": "1,2",
+            "E": "0,5"
+          },
+          "correct": "B",
+          "topic": "Məhdudlaşdırıcı reagent və qaz qarışığı",
+          "subtopics": [
+            "Piritin oksidləşməsi",
+            "Artıq reagent",
+            "Eyni kütlə və mol miqdarı"
+          ],
+          "difficulty": 3,
+          "solution_steps": [
+            "4FeS2 + 11O2 → 2Fe2O3 + 8SO2; hər ilkin maddənin kütləsi m olsun.",
+            "n(FeS2) = m/120; tələb olunan O2 = 11m/480, ilkin O2 = 15m/480 olduğundan O2 artıqdır.",
+            "Qalan O2 = m/120 mol; 32m/120 = 3,2 q şərtindən m = 12 q alınır.",
+            "0,1 mol FeS2-dən 0,2 mol SO2 yaranır; qalan O2 = 0,375 − 0,275 = 0,1 mol.",
+            "Fe2O3 bərkdir; qaz qarışığı 0,2 + 0,1 = 0,3 mol-dur."
+          ],
+          "key_formula": "n = m/M; n(qaz, son) = n(SO2) + n(O2, artıq)",
+          "wrong_options": {
+            "A": {
+              "likely_mistake": "Yalnız yaranan SO2-ni hesablamaq: n(SO2) = 2 × 0,1 = 0,2 mol; artıq O2-ni qaz qarışığından buraxmaq.",
+              "misconception_tag": "qaz_komponentini_buraxma",
+              "feedback_az": "0,2 mol yalnız SO2-nin miqdarıdır. Qabda qalan 0,1 mol O2-ni də əlavə etsən, qaz qarışığı 0,3 mol olar."
+            },
+            "C": {
+              "likely_mistake": "Yalnız qalan O2-ni hesablamaq: 3,2/32 = 0,1 mol; yaranan SO2-ni nəzərə almamaq.",
+              "misconception_tag": "qaz_komponentini_buraxma",
+              "feedback_az": "3,2 q qalıq 0,1 mol O2-yə uyğundur. Yaranan 0,2 mol SO2-ni də qaz qarışığına daxil etməlisən."
+            },
+            "D": {
+              "likely_mistake": "təsadüfi / aydın deyil",
+              "misconception_tag": "aydin_deyil",
+              "feedback_az": "Əvvəl hansı reagentin artıq olduğunu mol nisbəti ilə müəyyən et. Sonra 0,2 mol SO2 və 0,1 mol O2-ni topladıqda 0,3 mol alınır."
+            },
+            "E": {
+              "likely_mistake": "təsadüfi / aydın deyil",
+              "misconception_tag": "aydin_deyil",
+              "feedback_az": "Qaz qarışığına yalnız SO2 və artıq O2 daxildir. Fe2O3 bərk olduğundan onu əlavə etmədən hesablasan, 0,3 mol taparsan."
+            }
+          },
+          "prerequisites": [
+            "reaksiya_tenliyi",
+            "mol_kutle",
+            "mol_ve_stexiometriya"
+          ],
+          "related_concepts": [
+            "artiq_ve_mehdudlasdirici_reagent",
+            "qaz_miqdari",
+            "reaksiyada_kutle_balansi"
+          ],
+          "related_questions": [
+            "MIQ_2025-09-03_Q1",
+            "MIQ_2025-09-03_Q5",
+            "MIQ_2024-10-03_Q3"
+          ],
+          "review_tip": "Eyni kütlənin eyni mol demək olmadığını və artıq reagentin son qaz qarışığına daxil edilməsini təkrar et.",
+          "confidence": "high",
+          "disagreement_note": null,
+          "dim_primary_topic": "K03",
+          "dim_secondary_topics": [
+            "K02",
+            "K19"
+          ],
+          "topic_confidence": "high",
+          "topic_note": null
+        },
+        {
+          "id": "MIQ_2024-10-03_Q2",
+          "question_text": "Uyğunluğu müəyyən edin.\n1. ΔH<0\n2. ΔH>0\n\na. Cr6+ → Cr3+\nb. sublimasiya\nc. kondensləşmə\nd. NH3 → NO",
+          "options": {
+            "A": "1-c,d; 2-a,b",
+            "B": "1-a,b; 2-c,d",
+            "C": "1-a,c; 2-b,d",
+            "D": "1-b,d; 2-a,c",
+            "E": "1-b,c; 2-a,d"
+          },
+          "correct": "A",
+          "topic": "Entalpiya və proseslərin istilik effekti",
+          "subtopics": [
+            "Ekzotermik və endotermik proseslər",
+            "Hal keçidləri",
+            "Redoks çevrilmələrinin şərtləri"
+          ],
+          "difficulty": 2,
+          "solution_steps": [
+            "ΔH<0 istilik ayrılmasını, ΔH>0 istilik udulmasını göstərir.",
+            "Kondensləşmə ekzotermikdir: c → 1; sublimasiya endotermikdir: b → 2.",
+            "NH3 → NO verilmiş həllə görə ammonyakın katalitik oksidləşməsidir və ekzotermikdir: d → 1.",
+            "Verilmiş açarda a → 2 götürülür; bu redoks bəndinin istilik effekti tam reaksiya və şərait göstərilmədən birmənalı deyil.",
+            "Açara uyğun nəticə: 1-c,d; 2-a,b, yəni A."
+          ],
+          "key_formula": "Ekzotermik: ΔH < 0; endotermik: ΔH > 0",
+          "wrong_options": {
+            "B": {
+              "likely_mistake": "ΔH-nin işarələrini tərsinə şərh etmək: açarın bütün 1 və 2 qruplarını dəyişərək 1-a,b; 2-c,d almaq.",
+              "misconception_tag": "entalpiya_isare_sehvi",
+              "feedback_az": "İstilik ayrılan proses üçün ΔH mənfi, istilik udulan proses üçün müsbətdir. Kondensləşməni və ammonyakın verilmiş oksidləşməsini mənfi qrupa yerləşdirməlisən."
+            },
+            "C": {
+              "likely_mistake": "d-ni endotermik sayıb a ilə yerini dəyişmək; NH3-in verilmiş oksidləşməsinin istilik ayırdığını nəzərə almamaq. a-nın ekzotermik sayılması isə natamam bəndə görə ayrıca qəti səhv kimi qiymətləndirilə bilməz.",
+              "misconception_tag": "redoks_istiliyini_umumilesdirme",
+              "feedback_az": "NH3 → NO çevrilməsi burada katalitik oksidləşmə kimi qəbul edilir və istilik ayırır. a bəndi natamam olsa da, verilmiş açara əsasən cavabı 1-c,d; 2-a,b qurmalısan."
+            },
+            "D": {
+              "likely_mistake": "Sublimasiyanı istilik ayıran, kondensləşməni istilik udan sayaraq b və c-ni qarşılıqlı dəyişmək; a və d-ni açara uyğun saxlamaq.",
+              "misconception_tag": "hal_kechidi_istilik_sehvi",
+              "feedback_az": "Bərk maddənin birbaşa qaza keçməsi üçün istilik udulur. Qazın mayeyə çevrilməsində istilik ayrıldığına görə b müsbət, c mənfi ΔH qrupuna düşür."
+            },
+            "E": {
+              "likely_mistake": "Sublimasiyanı kondensləşmə kimi ekzotermik, NH3-in verilmiş oksidləşməsini isə endotermik saymaq; b və d-ni açardakı yerlərindən dəyişmək.",
+              "misconception_tag": "proseslerin_istiliyini_qarisdirma",
+              "feedback_az": "Sublimasiya zamanı istilik udulur, ammonyakın verilmiş katalitik oksidləşməsində isə istilik ayrılır. c-ni mənfi qrupda saxlayıb b-ni müsbət, d-ni mənfi qrupa keçirməlisən."
+            }
+          },
+          "prerequisites": [
+            "entalpiya"
+          ],
+          "related_concepts": [
+            "hal_kechidleri",
+            "redoks"
+          ],
+          "related_questions": [
+            "MIQ_2025-09-03_Q4"
+          ],
+          "review_tip": "Hal keçidlərinin istilik istiqamətini və ΔH işarəsini təkrar et, redoks üçün isə tam reaksiyanın lazım olduğunu yadda saxla.",
+          "confidence": "medium",
+          "disagreement_note": "a bəndi (Cr6+ → Cr3+) termokimyəvi cəhətdən birmənalı deyil, açar müəllifin məntiqindən asılıdır; yalnız oksidləşmə dərəcələrinin dəyişməsi ΔH işarəsini təyin etmir. d bəndi verilmiş həllə uyğun ammonyakın katalitik oksidləşməsi kimi qəbul edilib. Verilmiş A cavabı dəyişdirilməyib.",
+          "dim_primary_topic": "K09",
+          "dim_secondary_topics": [
+            "K08",
+            "K15"
+          ],
+          "topic_confidence": "high",
+          "topic_note": null
+        },
+        {
+          "id": "MIQ_2024-10-03_Q3",
+          "question_text": "Qarışığın tərkibi | Qarışığın mol sayı | Qarışığın kütləsi, q\nC2H6; C4H6; C3H6 | 2 | 78\nQarışıqda neçə qram karbon var? Ar(C)=12, Ar(H)=1",
+          "options": {
+            "A": "56",
+            "B": "22",
+            "C": "44",
+            "D": "66",
+            "E": "38"
+          },
+          "correct": "D",
+          "topic": "Qarışıqda elementin kütləsi",
+          "subtopics": [
+            "Molekulyar formul",
+            "Ümumi mol miqdarı",
+            "Kütlə balansı"
+          ],
+          "difficulty": 2,
+          "solution_steps": [
+            "Cədvəldə 2 mol və 78 q ayrı maddələrə deyil, bütün qarışığa aiddir.",
+            "C2H6, C4H6 və C3H6 molekullarının hər birində 6 hidrogen atomu var.",
+            "n(H) = 6 × 2 = 12 mol; m(H) = 12 × 1 = 12 q.",
+            "Qarışıq yalnız C və H-dən ibarətdir: m(C) = 78 − 12 = 66 q."
+          ],
+          "key_formula": "n(H) = 6n(qarışıq); m(C) = m(qarışıq) − n(H)Ar(H)",
+          "wrong_options": {
+            "A": {
+              "likely_mistake": "təsadüfi / aydın deyil",
+              "misconception_tag": "aydin_deyil",
+              "feedback_az": "Hər molekulda 6 H olduğunu istifadə edib bütün qarışıq üçün hidrogen kütləsini tapmalısan. 12 q hidrogeni 78 q-dan çıxanda 66 q karbon alınır."
+            },
+            "B": {
+              "likely_mistake": "Ümumi karbon kütləsini düzgün 66 q tapdıqdan sonra qarışıqda üç maddə olduğuna görə 3-ə bölmək: 66/3 = 22 q; soruşulan ümumi kütləni orta qiymətlə qarışdırmaq.",
+              "misconception_tag": "umumi_ve_orta_qiymeti_qarisdirma",
+              "feedback_az": "Səndən maddə başına orta karbon kütləsi deyil, bütün qarışığın karbon kütləsi soruşulur. 66 q nəticəsini üçə bölmədən saxlamalısan."
+            },
+            "C": {
+              "likely_mistake": "təsadüfi / aydın deyil",
+              "misconception_tag": "aydin_deyil",
+              "feedback_az": "Cədvəldəki 2 mol-u hər komponent üçün ayrıca götürmədən bütün qarışığa aid etməlisən. Orta karbon indeksini bilmədən də hidrogenin 12 q olduğunu tapıb karbonu 66 q hesablaya bilərsən."
+            },
+            "E": {
+              "likely_mistake": "təsadüfi / aydın deyil",
+              "misconception_tag": "aydin_deyil",
+              "feedback_az": "Qarışıq kütləsini karbon və hidrogen kütlələrinin cəmi kimi yazmalısan. Hidrogen 12 q olduğundan qalan 66 q karbon olur."
+            }
+          },
+          "prerequisites": [
+            "mol_kutle",
+            "mol_ve_stexiometriya"
+          ],
+          "related_concepts": [
+            "molekulyar_formuldan_element_kutlesi",
+            "reaksiyada_kutle_balansi"
+          ],
+          "related_questions": [
+            "MIQ_2025-09-03_Q1",
+            "MIQ_2025-09-03_Q5",
+            "MIQ_2024-10-03_Q1"
+          ],
+          "review_tip": "Molekullarda ortaq atom sayından istifadə edərək qarışığın element kütləsini tapmağı təkrar et.",
+          "confidence": "high",
+          "disagreement_note": null,
+          "dim_primary_topic": "K02",
+          "dim_secondary_topics": [],
+          "topic_confidence": "high",
+          "topic_note": null
+        },
+        {
+          "id": "MIQ_2024-10-03_Q4",
+          "question_text": "Kumol molekulunda sp3- hibrid orbitalları rabitənin əmələ gəlməsində iştirak edən ümumi orbitalların neçə faizini təşkil edir?",
+          "options": {
+            "A": "20",
+            "B": "25",
+            "C": "40",
+            "D": "60",
+            "E": "50"
+          },
+          "correct": "B",
+          "topic": "Hibridləşmə və orbital sayımı",
+          "subtopics": [
+            "Kumolun quruluşu",
+            "Sigma və pi rabitələri",
+            "Rabitədə iştirak edən orbitalların faizi"
+          ],
+          "difficulty": 3,
+          "solution_steps": [
+            "Kumol C6H5−CH(CH3)2 quruluşundadır: benzol halqasında 6 sp2, yan qrupda 3 sp3 karbon var.",
+            "9 C−C sigma və 12 C−H sigma rabitəsi var: 21 sigma rabitəsində 21 × 2 = 42 orbital iştirak edir.",
+            "Halqadakı 3 pi rabitəsində 3 × 2 = 6 p-orbital iştirak edir; ümumi orbital sayı 48-dir.",
+            "sp3 orbitalların sayı 3 × 4 = 12-dir.",
+            "Tələb olunan faiz 12/48 × 100% = 25%-dir."
+          ],
+          "key_formula": "N(ümumi orbital) = 2N(sigma) + 2N(pi); sp3 faizi = N(sp3)/N(ümumi orbital) × 100%",
+          "wrong_options": {
+            "A": {
+              "likely_mistake": "21 × 2 + 3 × 2 = 48 hesabında hidrogenin 12 orbitalı artıq sayıldığı halda onları bir də əlavə etmək: 12/(48 + 12) × 100% = 20%.",
+              "misconception_tag": "orbital_tekrar_sayimi",
+              "feedback_az": "Hər C−H sigma rabitəsində iki orbital sayanda hidrogenin 1s orbitalını da saymış olursan. Həmin 12 orbitalı yenidən əlavə etmədən məxrəci 48 götürməlisən."
+            },
+            "C": {
+              "likely_mistake": "Məxrəcə yalnız karbonun hibrid orbitallarını daxil etmək: 6 × 3 + 3 × 4 = 30; 12/30 × 100% = 40%; hidrogenin 1s və pi rabitələrinin p-orbitallarını buraxmaq.",
+              "misconception_tag": "qeyri_hibrid_orbitallari_buraxma",
+              "feedback_az": "Sual bütün rabitədə iştirak edən orbitalları soruşur. Karbonun 30 hibrid orbitalına 12 hidrogen 1s və 6 p-orbitalı əlavə edib məxrəci 48 almalısan."
+            },
+            "D": {
+              "likely_mistake": "sp3 əvəzinə sp2 orbitallarını saymaq və məxrəcə yalnız hibrid orbitalları yazmaq: (6 × 3)/(6 × 3 + 3 × 4) × 100% = 60%.",
+              "misconception_tag": "orbital_novu_ve_mexreci_qarisdirma",
+              "feedback_az": "Surətdə sp2 üçün 18 deyil, sp3 üçün 12 orbital yazmalısan. Məxrəcdə bütün rabitə orbitalları sayıldığına görə düzgün nisbət 12/48-dir."
+            },
+            "E": {
+              "likely_mistake": "Orbital sayı əvəzinə rabitə sayını məxrəcə yazmaq: 21 sigma + 3 pi = 24; 12/24 × 100% = 50%.",
+              "misconception_tag": "rabite_ve_orbital_sayini_qarisdirma",
+              "feedback_az": "Hər sigma və hər pi rabitəsində iki orbital iştirak edir. Buna görə məxrəc 24 rabitə deyil, 48 orbital olmalıdır."
+            }
+          },
+          "prerequisites": [
+            "hibridlesme",
+            "sigma_ve_pi_rabiteleri",
+            "kutle_payi_ve_faiz"
+          ],
+          "related_concepts": [
+            "orbital_sayimi",
+            "arenler_ve_kumol"
+          ],
+          "related_questions": [
+            "MIQ_2025-09-03_Q4",
+            "MIQ_2024-10-03_Q5"
+          ],
+          "review_tip": "Kumolun quruluşunda karbonların hibridləşməsini və hər rabitəyə iki orbital düşdüyünü təkrar et.",
+          "confidence": "high",
+          "disagreement_note": null,
+          "dim_primary_topic": "K07",
+          "dim_secondary_topics": [
+            "K06",
+            "K27"
+          ],
+          "topic_confidence": "high",
+          "topic_note": null
+        },
+        {
+          "id": "MIQ_2024-10-03_Q5",
+          "question_text": "Maddə | Hibrid orbital sayı | Rabitə yaradan hibrid orbital sayı\nX | a | a\nX-i müəyyən edin.\n1. NH3\n2. CH4\n3. H2O\n4. CH≡CH",
+          "options": {
+            "A": "1, 4",
+            "B": "2, 4",
+            "C": "1, 3",
+            "D": "3, 4",
+            "E": "1, 2"
+          },
+          "correct": "B",
+          "topic": "Hibrid orbitalların rabitədə iştirakı",
+          "subtopics": [
+            "sp və sp3 hibridləşmə",
+            "Rabitəsiz elektron cütləri",
+            "Hibrid orbital sayımı"
+          ],
+          "difficulty": 2,
+          "solution_steps": [
+            "Şərt bütün hibrid orbitalların rabitə yaratmasını tələb edir; rabitəsiz elektron cütünü saxlayan hibrid orbital olmamalıdır.",
+            "NH3-də N-in 4 sp3 orbitalından 3-ü, H2O-da O-nun 4 sp3 orbitalından 2-si rabitə yaradır; 1 və 3 uyğun deyil.",
+            "CH4-də C-in 4 sp3 orbitalının hamısı rabitə yaradır: 4 = 4.",
+            "CH≡CH-də iki C-in cəmi 4 sp orbitalının hamısı sigma rabitələrində iştirak edir; pi rabitələrini hibridləşməmiş p-orbitalları yaradır.",
+            "Uyğun maddələr 2 və 4-dür; cavab B-dir."
+          ],
+          "key_formula": "N(hibrid orbital) = N(rabitə yaradan hibrid orbital) ⇔ rabitəsiz cüt saxlayan hibrid orbital yoxdur",
+          "wrong_options": {
+            "A": {
+              "likely_mistake": "NH3-də N-in yalnız rabitə yaradan üç orbitalını ümumi hibrid orbital sayı kimi götürmək: 3 = 3; rabitəsiz cütü saxlayan dördüncü orbitalı buraxmaq. CH≡CH isə həqiqətən uyğundur.",
+              "misconception_tag": "tek_cutleri_nezere_almama",
+              "feedback_az": "NH3-də ümumi hibrid orbital sayı 4, rabitə yaradanların sayı 3-dür. Buna görə NH3-ü uyğun saymamalı, CH4 və CH≡CH-ni seçməlisən."
+            },
+            "C": {
+              "likely_mistake": "NH3 üçün 3 = 3 və H2O üçün 2 = 2 yazmaq; yalnız rabitədə iştirak edən orbitalları sayıb rabitəsiz cütləri saxlayan orbitalları ümumi saydan çıxarmaq.",
+              "misconception_tag": "tek_cutleri_nezere_almama",
+              "feedback_az": "NH3 və H2O-nun mərkəzi atomlarının hər birində ümumilikdə 4 sp3 orbitalı var. Rabitə yaradanların sayı uyğun olaraq 3 və 2 olduğundan hər ikisi şərti ödəmir."
+            },
+            "D": {
+              "likely_mistake": "H2O-da O-nun iki rabitə orbitalını ümumi hibrid orbital sayı saymaq: 2 = 2; iki rabitəsiz cütün orbitallarını buraxmaq. CH≡CH uyğunluğu düzgündür.",
+              "misconception_tag": "tek_cutleri_nezere_almama",
+              "feedback_az": "H2O-da oksigenin iki rabitəsiz cütü də iki sp3 orbitalı tutur. Beləliklə 4 ümumi və 2 rabitə orbitalı olduğundan suyu seçməməlisən."
+            },
+            "E": {
+              "likely_mistake": "NH3-də rabitəsiz cütün tutduğu orbitalı buraxaraq üç ümumi və üç rabitə orbitalı qəbul etmək; onu düzgün uyğun olan CH4 ilə birləşdirmək.",
+              "misconception_tag": "tek_cutleri_nezere_almama",
+              "feedback_az": "CH4-ü seçməyin doğrudur, amma NH3-də dördüncü sp3 orbitalı rabitəsiz cütü saxlayır. İkinci uyğun maddə bütün sp orbitalları rabitədə iştirak edən CH≡CH-dir."
+            }
+          },
+          "prerequisites": [
+            "hibridlesme",
+            "sigma_ve_pi_rabiteleri"
+          ],
+          "related_concepts": [
+            "rabitesiz_elektron_cutleri",
+            "orbital_sayimi"
+          ],
+          "related_questions": [
+            "MIQ_2024-10-03_Q4"
+          ],
+          "review_tip": "Ümumi hibrid orbital sayı ilə rabitədə iştirak edən hibrid orbital sayını ayrı hesablamağı təkrar et.",
+          "confidence": "high",
+          "disagreement_note": null,
+          "dim_primary_topic": "K07",
+          "dim_secondary_topics": [
+            "K06"
+          ],
+          "topic_confidence": "high",
+          "topic_note": null
+        }
+      ]
+    }
+  ],
+  "concepts": [
+    {
+      "id": "reaksiya_tenliyi",
+      "name_az": "Reaksiya tənliyi və əmsallar",
+      "short_explanation_az": "Tarazlaşdırılmış tənlikdə hər elementin atom sayı qorunur; əmsallar maddələrin mol nisbətini göstərir.",
+      "prerequisites": [],
+      "related": [
+        "mol_ve_stexiometriya",
+        "reaksiyada_kutle_balansi"
+      ]
+    },
+    {
+      "id": "mol_kutle",
+      "name_az": "Mol və molyar kütlə",
+      "short_explanation_az": "Molyar kütlə bir mol maddənin kütləsidir; maddə miqdarı n = m/M ilə hesablanır.",
+      "prerequisites": [],
+      "related": [
+        "mol_ve_stexiometriya",
+        "molekulyar_formuldan_element_kutlesi"
+      ]
+    },
+    {
+      "id": "mol_ve_stexiometriya",
+      "name_az": "Mol və stexiometriya",
+      "short_explanation_az": "Maddələrin sərf olunan və yaranan mol miqdarları tənlik əmsallarının nisbəti ilə əlaqələndirilir.",
+      "prerequisites": [
+        "reaksiya_tenliyi",
+        "mol_kutle"
+      ],
+      "related": [
+        "reaksiya_ciximi",
+        "artiq_ve_mehdudlasdirici_reagent",
+        "qaz_miqdari"
+      ]
+    },
+    {
+      "id": "kutle_payi_ve_faiz",
+      "name_az": "Kütlə payı və faiz hesabı",
+      "short_explanation_az": "Kütlə payı hissənin ümumi kütləyə nisbətidir; artım faizi isə kütlə fərqinin ilkin kütləyə nisbətindən hesablanır.",
+      "prerequisites": [],
+      "related": [
+        "reaksiyada_kutle_balansi",
+        "reaksiya_ciximi"
+      ]
+    },
+    {
+      "id": "reaksiya_ciximi",
+      "name_az": "Reaksiya çıxımı və qismən çevrilmə",
+      "short_explanation_az": "Bu sualda 25% çıxım başlanğıc XY2-nin 25%-nin çevrilməsi kimi tətbiq edilir; qalan reagent son qarışığa daxildir.",
+      "prerequisites": [
+        "mol_ve_stexiometriya",
+        "kutle_payi_ve_faiz"
+      ],
+      "related": [
+        "qaz_miqdari",
+        "artiq_ve_mehdudlasdirici_reagent"
+      ]
+    },
+    {
+      "id": "qaz_miqdari",
+      "name_az": "Qaz qarışığının mol miqdarı",
+      "short_explanation_az": "Son qaz qarışığının miqdarı yaranan və artıq qalan bütün qazların mol miqdarlarının cəmidir; bərk maddələr bu cəmə daxil edilmir.",
+      "prerequisites": [
+        "mol_ve_stexiometriya"
+      ],
+      "related": [
+        "artiq_ve_mehdudlasdirici_reagent",
+        "reaksiya_ciximi"
+      ]
+    },
+    {
+      "id": "artiq_ve_mehdudlasdirici_reagent",
+      "name_az": "Artıq və məhdudlaşdırıcı reagent",
+      "short_explanation_az": "Tənlik nisbətinə görə əvvəl tükənən reagent məhsul miqdarını məhdudlaşdırır; digər reagentdən qalıq qala bilər.",
+      "prerequisites": [
+        "mol_ve_stexiometriya"
+      ],
+      "related": [
+        "qaz_miqdari",
+        "reaksiyada_kutle_balansi"
+      ]
+    },
+    {
+      "id": "hecm_vahidleri",
+      "name_az": "Həcm vahidlərinin çevrilməsi",
+      "short_explanation_az": "1 L = 1000 ml olduğundan millilitr ilə verilmiş həcmi 1000-ə bölərək litrə çevirmək lazımdır.",
+      "prerequisites": [],
+      "related": [
+        "molyar_qatiliq"
+      ]
+    },
+    {
+      "id": "molyar_qatiliq",
+      "name_az": "Molyar qatılıq",
+      "short_explanation_az": "Molyar qatılıq c = n/V ilə hesablanır; mol/L vahidi üçün həcm litr ilə yazılır.",
+      "prerequisites": [
+        "hecm_vahidleri"
+      ],
+      "related": [
+        "elektrolitik_dissosiasiya",
+        "mehlullarin_qarisdirilmasi",
+        "ph_ve_guclu_tursu"
+      ]
+    },
+    {
+      "id": "elektrolitik_dissosiasiya",
+      "name_az": "Elektrolitik dissosiasiya və ion sayı",
+      "short_explanation_az": "Maddə həll olarkən ionlara ayrılır; MgCl2 hər formul vahidindən iki, AlCl3 üç Cl- ionu verir.",
+      "prerequisites": [
+        "reaksiya_tenliyi"
+      ],
+      "related": [
+        "molyar_qatiliq",
+        "mehlullarin_qarisdirilmasi",
+        "ph_ve_guclu_tursu"
+      ]
+    },
+    {
+      "id": "mehlullarin_qarisdirilmasi",
+      "name_az": "Məhlulların qarışdırılması",
+      "short_explanation_az": "Bu tapşırıqda həcm toplanır və ionlar reaksiyaya girmir: son qatılıq ionların ümumi mol miqdarının ümumi həcmə nisbətidir.",
+      "prerequisites": [
+        "molyar_qatiliq",
+        "elektrolitik_dissosiasiya"
+      ],
+      "related": [
+        "mol_ve_stexiometriya"
+      ]
+    },
+    {
+      "id": "ph_ve_guclu_tursu",
+      "name_az": "Güclü turşu və pH",
+      "short_explanation_az": "HCl kimi güclü birprotonlu turşu üçün bu şəraitdə [H+] turşunun qatılığına bərabərdir və pH = −lg[H+].",
+      "prerequisites": [
+        "molyar_qatiliq",
+        "elektrolitik_dissosiasiya"
+      ],
+      "related": [
+        "hecm_vahidleri"
+      ]
+    },
+    {
+      "id": "reaksiyada_kutle_balansi",
+      "name_az": "Reaksiyada və qarışıqda kütlə balansı",
+      "short_explanation_az": "Ümumi kütlə qorunur, lakin yalnız bərk nümunə hesablanırsa ayrılan qaz onun son kütləsinə daxil edilmir.",
+      "prerequisites": [
+        "reaksiya_tenliyi",
+        "mol_kutle"
+      ],
+      "related": [
+        "kutle_payi_ve_faiz",
+        "artiq_ve_mehdudlasdirici_reagent",
+        "molekulyar_formuldan_element_kutlesi"
+      ]
+    },
+    {
+      "id": "molekulyar_formuldan_element_kutlesi",
+      "name_az": "Molekulyar formuldan elementin kütləsi",
+      "short_explanation_az": "Bir molekulda elementin atom sayını maddənin mol miqdarına vuraraq həmin atomların mol miqdarı, sonra elementin kütləsi tapılır.",
+      "prerequisites": [
+        "mol_kutle",
+        "mol_ve_stexiometriya"
+      ],
+      "related": [
+        "reaksiyada_kutle_balansi"
+      ]
+    },
+    {
+      "id": "entalpiya",
+      "name_az": "Entalpiya və istilik effekti",
+      "short_explanation_az": "Ekzotermik prosesdə ΔH<0, endotermik prosesdə ΔH>0 olur; istilik effektini müəyyən edərkən proses və şərait göstərilməlidir.",
+      "prerequisites": [],
+      "related": [
+        "rabite_enerjisi",
+        "hal_kechidleri",
+        "redoks"
+      ]
+    },
+    {
+      "id": "rabite_enerjisi",
+      "name_az": "Rabitə enerjisi ilə entalpiya hesabı",
+      "short_explanation_az": "Rabitənin qırılması enerji tələb edir, yaranması enerji ayırır; ΔH qırılan rabitə enerjiləri cəmindən yarananların cəmini çıxmaqla təqribi hesablanır.",
+      "prerequisites": [
+        "entalpiya",
+        "reaksiya_tenliyi",
+        "sigma_ve_pi_rabiteleri"
+      ],
+      "related": [
+        "orbital_sayimi"
+      ]
+    },
+    {
+      "id": "hal_kechidleri",
+      "name_az": "Hal keçidlərinin istilik effekti",
+      "short_explanation_az": "Sublimasiya bərkdən qaza keçiddir və istilik udur; kondensləşmə qazdan mayeyə keçiddir və istilik ayırır.",
+      "prerequisites": [
+        "entalpiya"
+      ],
+      "related": [
+        "reaksiyada_kutle_balansi"
+      ]
+    },
+    {
+      "id": "redoks",
+      "name_az": "Oksidləşmə-reduksiya çevrilmələri",
+      "short_explanation_az": "Oksidləşmə dərəcəsinin artması oksidləşmə, azalması reduksiyadır; tək bu dəyişmə reaksiyanın ΔH işarəsini təyin etmir.",
+      "prerequisites": [],
+      "related": [
+        "entalpiya",
+        "reaksiya_tenliyi"
+      ]
+    },
+    {
+      "id": "hibridlesme",
+      "name_az": "sp, sp2 və sp3 hibridləşməsi",
+      "short_explanation_az": "Məktəb modelində sp iki, sp2 üç, sp3 dörd hibrid orbital yaradır; bu orbitallar rabitə yarada və ya rabitəsiz elektron cütü saxlaya bilər.",
+      "prerequisites": [],
+      "related": [
+        "sigma_ve_pi_rabiteleri",
+        "rabitesiz_elektron_cutleri",
+        "orbital_sayimi"
+      ]
+    },
+    {
+      "id": "sigma_ve_pi_rabiteleri",
+      "name_az": "Sigma və pi rabitələri",
+      "short_explanation_az": "Sadə rabitə bir sigma, ikiqat rabitə bir sigma və bir pi, üçqat rabitə bir sigma və iki pi rabitəsindən ibarətdir.",
+      "prerequisites": [],
+      "related": [
+        "hibridlesme",
+        "orbital_sayimi",
+        "rabite_enerjisi"
+      ]
+    },
+    {
+      "id": "rabitesiz_elektron_cutleri",
+      "name_az": "Rabitəsiz elektron cütləri",
+      "short_explanation_az": "Rabitəsiz elektron cütü atomda qalır və rabitə yaratmır; məktəb hibridləşmə modelində NH3-də bir, H2O-da iki belə cüt sp3 orbitallarını tutur.",
+      "prerequisites": [
+        "hibridlesme"
+      ],
+      "related": [
+        "orbital_sayimi"
+      ]
+    },
+    {
+      "id": "orbital_sayimi",
+      "name_az": "Rabitədə iştirak edən orbitalların sayımı",
+      "short_explanation_az": "Bu tapşırıqlarda hər sigma və hər pi rabitəsi iki orbitalın iştirakı ilə sayılır; ümumi orbital sayı ilə yalnız hibrid orbital sayı fərqləndirilir.",
+      "prerequisites": [
+        "hibridlesme",
+        "sigma_ve_pi_rabiteleri"
+      ],
+      "related": [
+        "rabitesiz_elektron_cutleri",
+        "arenler_ve_kumol"
+      ]
+    },
+    {
+      "id": "arenler_ve_kumol",
+      "name_az": "Arenlər və kumolun quruluşu",
+      "short_explanation_az": "Kumol izopropilbenzoldur: C6H5−CH(CH3)2; halqada altı sp2, yan qrupda üç sp3 karbon vardır.",
+      "prerequisites": [
+        "hibridlesme",
+        "sigma_ve_pi_rabiteleri"
+      ],
+      "related": [
+        "orbital_sayimi"
+      ]
+    }
+  ],
+  "misconceptions": [
+    {
+      "tag": "stexiometrik_nisbet_sehvi",
+      "description_az": "Məhsul əmsalına vurub reagent əmsalına bölməyi unutmaq.",
+      "fix_az": "Əvvəl ν(məhsul)/ν(reagent) nisbətini yaz, sonra sərf olunan reagentin mol miqdarına vur.",
+      "related_concepts": [
+        "mol_ve_stexiometriya",
+        "reaksiya_tenliyi"
+      ]
+    },
+    {
+      "tag": "qismen_cevrilmeni_tam_sayma",
+      "description_az": "Qismən reaksiya üçün bütün başlanğıc maddəni çevrilmiş qəbul etmək.",
+      "fix_az": "Çevrilən və qalan hissələri ayrı hesabla, son qarışıqda hər ikisini nəzərə al.",
+      "related_concepts": [
+        "reaksiya_ciximi",
+        "qaz_miqdari"
+      ]
+    },
+    {
+      "tag": "birlesmis_stexiometriya_sehvi",
+      "description_az": "Əmsal nisbətini səhv tətbiq etməklə yanaşı qismən çevrilməni tam çevrilmə kimi hesablamaq.",
+      "fix_az": "Əvvəl çevrilən mol miqdarını, sonra əmsal nisbətini, sonda qalıqla birlikdə ümumi miqdarı yoxla.",
+      "related_concepts": [
+        "mol_ve_stexiometriya",
+        "reaksiya_ciximi",
+        "qaz_miqdari"
+      ]
+    },
+    {
+      "tag": "hecm_cevrilmesi_sehvi",
+      "description_az": "Millilitri litr kimi istifadə etmək və ya çevirmə əmsalını səhv seçmək.",
+      "fix_az": "Molyar qatılıqdan əvvəl V(L) = V(ml)/1000 yaz.",
+      "related_concepts": [
+        "hecm_vahidleri",
+        "molyar_qatiliq",
+        "ph_ve_guclu_tursu"
+      ]
+    },
+    {
+      "tag": "aydin_deyil",
+      "description_az": "Verilən yanlış variant üçün əsaslandırılmış konkret səhv yolu müəyyən edilməyib; seçim səbəbi məlum deyil.",
+      "fix_az": "Tələbədən hesab addımlarını istə və ilkin verilənlər, vahidlər, tənlik, nisbət və nəticəni ardıcıllıqla yoxla.",
+      "related_concepts": [
+        "mol_ve_stexiometriya",
+        "molyar_qatiliq",
+        "ph_ve_guclu_tursu",
+        "rabite_enerjisi",
+        "kutle_payi_ve_faiz",
+        "molekulyar_formuldan_element_kutlesi"
+      ]
+    },
+    {
+      "tag": "ion_indeksi_sehvi",
+      "description_az": "Duzun formulundakı ion indeksini səhv oxumaq və ya başqa duzun indeksini tətbiq etmək.",
+      "fix_az": "Hər duzun dissosiasiya tənliyini ayrı yazıb ion qatılığını onun əmsalı ilə hesabla.",
+      "related_concepts": [
+        "elektrolitik_dissosiasiya",
+        "mehlullarin_qarisdirilmasi"
+      ]
+    },
+    {
+      "tag": "qatiliqlari_yer_deyisme",
+      "description_az": "Qatılıqları aid olduqları maddələr arasında dəyişmək.",
+      "fix_az": "Maddə, qatılıq və ion sayını eyni sətirdə yazaraq hesabla.",
+      "related_concepts": [
+        "molyar_qatiliq",
+        "elektrolitik_dissosiasiya",
+        "mehlullarin_qarisdirilmasi"
+      ]
+    },
+    {
+      "tag": "son_kutleni_esas_goturme",
+      "description_az": "Artım faizində fərqi ilkin kütlə əvəzinə son kütləyə bölmək.",
+      "fix_az": "Artım% = (son kütlə − ilkin kütlə)/ilkin kütlə × 100% yaz.",
+      "related_concepts": [
+        "kutle_payi_ve_faiz",
+        "reaksiyada_kutle_balansi"
+      ]
+    },
+    {
+      "tag": "qaz_komponentini_buraxma",
+      "description_az": "Son qaz qarışığında məhsullardan və ya artıq reagentdən birini nəzərə almamaq.",
+      "fix_az": "Reaksiyadan sonra mövcud bütün qazları sadala və onların mol miqdarlarını topla.",
+      "related_concepts": [
+        "qaz_miqdari",
+        "artiq_ve_mehdudlasdirici_reagent"
+      ]
+    },
+    {
+      "tag": "entalpiya_isare_sehvi",
+      "description_az": "İstilik ayrılmasını müsbət, istilik udulmasını mənfi ΔH ilə göstərmək.",
+      "fix_az": "Ekzotermik üçün ΔH<0, endotermik üçün ΔH>0 qaydasını tətbiq et.",
+      "related_concepts": [
+        "entalpiya",
+        "hal_kechidleri"
+      ]
+    },
+    {
+      "tag": "redoks_istiliyini_umumilesdirme",
+      "description_az": "Oksidləşmə və ya reduksiya olmasına əsasən hər proses üçün sabit ΔH işarəsi təyin etmək.",
+      "fix_az": "İstilik effektini tam reaksiyaya və şəraitə görə qiymətləndir; natamam redoks bəndi üçün qeyri-müəyyənliyi saxla.",
+      "related_concepts": [
+        "redoks",
+        "entalpiya"
+      ]
+    },
+    {
+      "tag": "hal_kechidi_istilik_sehvi",
+      "description_az": "Sublimasiya və kondensləşmənin istilik istiqamətlərini dəyişmək.",
+      "fix_az": "Sublimasiyada istilik udulduğunu, kondensləşmədə ayrıldığını yadda saxla.",
+      "related_concepts": [
+        "hal_kechidleri",
+        "entalpiya"
+      ]
+    },
+    {
+      "tag": "proseslerin_istiliyini_qarisdirma",
+      "description_az": "Hal keçidinin və verilmiş kimyəvi reaksiyanın istilik təsnifatını səhv qruplaşdırmaq.",
+      "fix_az": "Hər prosesi ayrıca qiymətləndir, sonra ΔH işarəsinə uyğun qrupa yerləşdir.",
+      "related_concepts": [
+        "hal_kechidleri",
+        "redoks",
+        "entalpiya"
+      ]
+    },
+    {
+      "tag": "umumi_ve_orta_qiymeti_qarisdirma",
+      "description_az": "Ümumi element kütləsini maddələrin sayına bölüb soruşulmayan orta qiyməti vermək.",
+      "fix_az": "Sualın bütün qarışıq üçün toplam kütlə, yoxsa orta qiymət istədiyini yoxla.",
+      "related_concepts": [
+        "molekulyar_formuldan_element_kutlesi",
+        "reaksiyada_kutle_balansi"
+      ]
+    },
+    {
+      "tag": "orbital_tekrar_sayimi",
+      "description_az": "Rabitələrin iki orbitalı hesabında artıq daxil edilmiş hidrogen orbitallarını yenidən əlavə etmək.",
+      "fix_az": "Hər rabitənin orbital iştirakçılarını yalnız bir dəfə say.",
+      "related_concepts": [
+        "orbital_sayimi",
+        "sigma_ve_pi_rabiteleri"
+      ]
+    },
+    {
+      "tag": "qeyri_hibrid_orbitallari_buraxma",
+      "description_az": "Bütün rabitə orbitalları soruşulduqda yalnız hibrid orbitalları saymaq.",
+      "fix_az": "Məxrəcə hidrogenin 1s orbitallarını və pi rabitələrindəki hibridləşməmiş p-orbitallarını da daxil et.",
+      "related_concepts": [
+        "orbital_sayimi",
+        "hibridlesme",
+        "sigma_ve_pi_rabiteleri"
+      ]
+    },
+    {
+      "tag": "orbital_novu_ve_mexreci_qarisdirma",
+      "description_az": "Soruşulan sp3 orbitalları əvəzinə sp2 orbitallarını saymaq və ümumi say əvəzinə yalnız hibrid orbitalları əsas götürmək.",
+      "fix_az": "Surətdə soruşulan orbital növünü, məxrəcdə sualda göstərilən bütün orbital növlərini say.",
+      "related_concepts": [
+        "hibridlesme",
+        "orbital_sayimi",
+        "arenler_ve_kumol"
+      ]
+    },
+    {
+      "tag": "rabite_ve_orbital_sayini_qarisdirma",
+      "description_az": "Orbital faizi hesabında məxrəcə orbital sayı əvəzinə rabitə sayı yazmaq.",
+      "fix_az": "Bu hesab modelində hər sigma və hər pi rabitəsi üçün iki orbital götür.",
+      "related_concepts": [
+        "sigma_ve_pi_rabiteleri",
+        "orbital_sayimi"
+      ]
+    },
+    {
+      "tag": "tek_cutleri_nezere_almama",
+      "description_az": "Ümumi hibrid orbital sayında rabitəsiz elektron cütlərini saxlayan orbitalları buraxmaq.",
+      "fix_az": "Əvvəl bütün hibrid orbitalları say, sonra onların neçə dənəsinin rabitə yaratdığını ayrıca müəyyən et.",
+      "related_concepts": [
+        "hibridlesme",
+        "rabitesiz_elektron_cutleri",
+        "orbital_sayimi"
+      ]
+    }
+  ]
+}

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import MissedItem from '../components/MissedItem'
+import { topicName } from '../lib/topicNames'
 import { analyzeStudent, score, weakTopics, type Answers, type Question } from '../lib/scoring'
 
 type Quiz = { id: string; title: string; status: string }
@@ -122,7 +123,7 @@ export default function Student() {
       <p className="text-sm text-gray-600">
         Sual {saved.index + 1} / {questions.length}
       </p>
-      <h1 className="text-xl font-bold">{q.text}</h1>
+      <h1 className="whitespace-pre-line text-xl font-bold">{q.text}</h1>
       <div className="space-y-3">
         {q.options.map((o) => (
           <button
@@ -190,7 +191,7 @@ function Result({ quiz, questions, answers }: { quiz: Quiz; questions: Question[
       </p>
       <section>
         <h2 className="font-semibold">Zəif mövzular</h2>
-        <p>{weak.length ? weak.join(', ') : 'Zəif mövzu yoxdur.'}</p>
+        <p>{weak.length ? weak.map(topicName).join(', ') : 'Zəif mövzu yoxdur.'}</p>
       </section>
       {strong.length > 0 && (
         <section>
