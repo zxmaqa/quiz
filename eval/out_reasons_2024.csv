@@ -1,0 +1,21 @@
+qid,option,ai_reason,check_applicable,check_passed,unknown_reason
+MIQ_2024-10-03_Q1,A,Reaksiya tənliyində yanlış stöxiometrik əmsallar istifadə edilib,true,false,check_failed: not_arithmetic
+MIQ_2024-10-03_Q1,C,Həddləyici reaktantı səhv seçib və hesablamada xəta edilib,true,false,check_failed: not_arithmetic
+MIQ_2024-10-03_Q1,D,Qaz məhsulunun miqdarını hesablayarkən başlanğıc maddələrin miqdarı ilə səhv əməliyyat aparılıb,true,false,check_failed: not_arithmetic
+MIQ_2024-10-03_Q1,E,Həddləyici reaktantı səhv müəyyən edib,true,false,check_failed: not_arithmetic
+MIQ_2024-10-03_Q2,B,Reduksiya reaksiyasının (Cr6+ → Cr3+) ekzotermik olduğunu düşünüb,false,,unchecked_not_high_confidence
+MIQ_2024-10-03_Q2,C,Kondensləşmənin endotermik olduğunu düşünüb,false,,
+MIQ_2024-10-03_Q2,D,Sublimasiya ilə kondensləşmənin entalpiya dəyişikliklərini tərsinə çevirib,false,,
+MIQ_2024-10-03_Q2,E,Sublimasiya ilə reduksiya reaksiyasının entalpiya işarələrini səhv təyin edib,false,,unchecked_not_high_confidence
+MIQ_2024-10-03_Q3,A,Karbon atomlarının sayını hesablayarkən C4H6 və C3H6 maddələrinin kütləsini səhv hesablamışdır,true,false,check_failed: not_arithmetic
+MIQ_2024-10-03_Q3,B,Xətti tənlik sistemini həll edərkən hesab xətası edilib,true,false,check_failed: not_arithmetic
+MIQ_2024-10-03_Q3,C,Karbon atomlarının sayını hesablayarkən yalnız bir maddənin kütləsini nəzərə almışdır,true,false,check_failed: not_arithmetic
+MIQ_2024-10-03_Q3,E,Qarışığın tərkibini müəyyən edərkən hesab xətası edilib,true,false,check_failed: not_arithmetic
+MIQ_2024-10-03_Q4,A,Kumolda sp3-hibrid orbitallarının sayını səhv hesablamışdır,true,false,check_failed: not_arithmetic
+MIQ_2024-10-03_Q4,C,Rabitə yaradan hibrid orbitalların faizini hesablayarkən bütün hibrid orbitalları rabitə yaradan kimi sayıb,true,false,check_failed: not_arithmetic
+MIQ_2024-10-03_Q4,D,Rabitə yaradan hibrid orbitalların faizini səhv hesablamışdır,true,false,check_failed: not_arithmetic
+MIQ_2024-10-03_Q4,E,Kumolda sp3-hibrid orbitallarının sayını səhv müəyyən edib,true,false,check_failed: not_arithmetic
+MIQ_2024-10-03_Q5,A,NH3 və CH≡CH maddələrində hibrid orbital sayı ilə rabitə yaradan hibrid orbital sayının bərabər olduğunu düşünüb,false,,
+MIQ_2024-10-03_Q5,C,NH3 və H2O maddələrində hibrid orbital sayı ilə rabitə yaradan hibrid orbital sayının bərabər olduğunu düşünüb,false,,
+MIQ_2024-10-03_Q5,D,H2O və CH≡CH maddələrində hibrid orbital sayı ilə rabitə yaradan hibrid orbital sayının bərabər olduğunu düşünüb,false,,
+MIQ_2024-10-03_Q5,E,NH3 və CH4 maddələrində hibrid orbital sayı ilə rabitə yaradan hibrid orbital sayının bərabər olduğunu düşünüb,false,,
