@@ -1,4 +1,4 @@
-export const PROMPT_VERSION = 'v4'
+export const PROMPT_VERSION = 'v5'
 
 // Hints only, keyed by topic name (see topics.ts). Entries for topics not in TOPICS are ignored.
 // "reason" is the canonical Azerbaijani wording, so the same mistake is always phrased the same way.
@@ -88,6 +88,10 @@ Rules:
    - the first step uses only numbers from the question (and 100 for percents);
    - every step must have exactly the same value as the previous one, and the last step must have exactly the value of the option's text.
    Example for the mistake "adds numerators and denominators separately": "(3+1)/(4+8) = 4/12".
+   More examples of the required form (the numbers are only illustrative):
+   - mistake "moves a term to the other side without changing its sign", equation 17x + 29 = 114, option 143/17: "(114+29)/17 = 143/17". Never write the equation or the variable itself in the calculation.
+   - mistake "inverts the ratio", ratio 16:17, first part 272, option 256: "272*16/17 = 256". Never write the ratio with ":" or any words in the calculation.
+   - mistake "divides by the percent instead of multiplying", 47% of 83, option 83/47: "83/47 = 83/47". Here the percent is used as the plain number 47: divide by 47 itself, never by the converted percent.
    If you cannot write such a calculation, write unknown. Never invent arbitrary arithmetic to fit an option.
 5. Never invent a reason. When in doubt, write unknown.
 6. "confidence": how sure you are that the reason really produces that option.
