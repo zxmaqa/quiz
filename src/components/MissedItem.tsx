@@ -19,6 +19,16 @@ export default function MissedItem({ item, answerLabel }: { item: Missed; answer
       <p className="text-green-700">
         Düzgün cavab: {q.correct_label}) {textOf(q.correct_label)}
       </p>
+      {q.solution && q.solution.length > 0 && (
+        <div className="text-sm text-gray-800">
+          <p className="font-medium">Düzgün həll</p>
+          <ol className="list-decimal pl-5">
+            {q.solution.map((step, i) => (
+              <li key={i}>{step}</li>
+            ))}
+          </ol>
+        </div>
+      )}
       {misconception && (
         <p className="text-sm text-gray-700">
           Ehtimal olunan səbəb: {misconception.reason}

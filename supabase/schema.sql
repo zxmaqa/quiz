@@ -54,6 +54,9 @@ alter table ai_calls add column if not exists details jsonb;
 -- subject picks the topic list and prompt in analyze-quiz: math (default) or chemistry
 alter table groups add column if not exists subject text default 'math';
 
+-- solution: verified worked solution steps (chemistry numeric questions only), ["expr = value", ...] or null
+alter table questions add column if not exists solution jsonb;
+
 alter table groups enable row level security;
 alter table quizzes enable row level security;
 alter table questions enable row level security;

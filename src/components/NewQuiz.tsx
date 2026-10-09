@@ -148,6 +148,7 @@ export default function NewQuiz({ groupId, onSaved }: { groupId: string; onSaved
           </select>
           {q.options.map((o) => {
             const m = q.correct === o.label ? undefined : q.misconceptions?.[o.label]
+            const shown = m && m.reason !== 'unknown' && !m.unchecked ? m : null
             return (
               <div key={o.label}>
                 <button
@@ -158,13 +159,11 @@ export default function NewQuiz({ groupId, onSaved }: { groupId: string; onSaved
                 >
                   <span className="font-bold">{o.label}</span> {o.text}
                 </button>
-                {m && (
+                {shown && (
                   <p className="px-2 pt-1 text-sm text-gray-700">
-                    {m.reason === 'unknown'
-                      ? 'Səbəb məlum deyil'
-                      : `Ehtimal olunan səbəb: ${m.reason}${
-                          m.calculation ? ` (ehtimal olunan hesablama: ${m.calculation})` : ''
-                        }${m.unchecked ? ' (yoxlanılmayıb)' : ''}`}
+                    {`Ehtimal olunan səbəb: ${shown.reason}${
+                      shown.calculation ? ` (ehtimal olunan hesablama: ${shown.calculation})` : ''
+                    }`}
                   </p>
                 )}
               </div>

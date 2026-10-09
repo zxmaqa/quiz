@@ -16,6 +16,7 @@ export type Question = {
   options: Option[]
   correct_label: string
   misconceptions: Record<string, Misconception> | null
+  solution?: string[] | null // verified worked solution steps (chemistry numeric questions only)
 }
 
 // question id -> chosen label, null = left blank
@@ -79,14 +80,14 @@ export function analyzeStudent(questions: Question[], answers: Answers) {
     missed.push({
       q,
       chosen,
-      misconception: m && m.reason && m.reason !== 'unknown' ? m : null,
+      misconception: m && m.reason && m.reason !== 'unknown' && !m.unchecked ? m : null,
       ranOut: timeRanOut && !chosen && i >= questions.length - trailing,
     })
   })
 
   const counts = new Map<string, StrongSignal>()
   for (const { misconception } of missed) {
-    if (!misconception || misconception.unchecked) continue
+    if (!misconception) continue
     const key = normalize(misconception.reason)
     const entry = counts.get(key) ?? { reason: misconception.reason, count: 0 }
     entry.count += 1
